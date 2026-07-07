@@ -1,0 +1,216 @@
+import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import { Image } from "expo-image";
+import { Ionicons } from "@expo/vector-icons";
+
+import { CourseCard } from "@/types/home";
+
+interface Props {
+  title: string;
+  courses: CourseCard[];
+  onPress(course: CourseCard): void;
+}
+
+function formatDuration(seconds?: number | null) {
+  if (!seconds) return "0 min";
+
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+
+  if (hours === 0) {
+    return `${minutes} min`;
+  }
+
+  return `${hours}h ${minutes}m`;
+}
+
+export default function CourseHorizontalList({
+  title,
+  courses,
+  onPress,
+}: Props) {
+  if (!courses.length) return null;
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.heading}>{title}</Text>
+
+      <FlatList
+        horizontal
+        data={courses}
+        keyExtractor={(item) => item.id}
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.list}
+        renderItem={({ item }) => (
+          <Pressable
+            style={styles.card}
+            onPress={() => onPress(item)}
+          >
+            <Image
+              source={{ uri: item.thumbnailUrl }}
+              style={styles.image}
+              contentFit="cover"
+            />
+
+            <View style={styles.content}>
+              <Text
+                numberOfLines={2}
+                style={styles.title}
+              >
+                {item.title}
+              </Text>
+
+              <Text style={styles.category}>
+                {item.category.name}
+              </Text>
+
+              <View style={styles.levelContainer}>
+                <Text style={styles.level}>
+                  {item.level}
+                </Text>
+              </View>
+
+              <View style={styles.progressBackground}>
+                <View
+                  style={[
+                    styles.progress,
+                    {
+                      width: `${item.progress}%`,
+                    },
+                  ]}
+                />
+              </View>
+
+              <Text style={styles.progressText}>
+                {item.progress}% Completed
+              </Text>
+
+              <View style={styles.footer}>
+                <View style={styles.info}>
+                  <Ionicons
+                    name="book-outline"
+                    size={15}
+                    color="#666"
+                  />
+
+                  <Text style={styles.infoText}>
+                    {item.totalLessons}
+                  </Text>
+                </View>
+
+                <View style={styles.info}>
+                  <Ionicons
+                    name="time-outline"
+                    size={15}
+                    color="#666"
+                  />
+
+                  <Text style={styles.infoText}>
+                    {formatDuration(item.totalDuration)}
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </Pressable>
+        )}
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    marginBottom: 30,
+  },
+
+  heading: {
+    fontSize: 22,
+    fontWeight: "700",
+    marginBottom: 16,
+    color: "#111827",
+  },
+
+  list: {
+    paddingRight: 20,
+  },
+
+  card: {
+    width: 270,
+    backgroundColor: "#fff",
+    borderRadius: 20,
+    overflow: "hidden",
+    marginRight: 16,
+    elevation: 3,
+  },
+
+  image: {
+    width: "100%",
+    height: 160,
+  },
+
+  content: {
+    padding: 16,
+  },
+
+  title: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#111827",
+  },
+
+  category: {
+    marginTop: 6,
+    color: "#6B7280",
+    fontSize: 14,
+  },
+
+  levelContainer: {
+    alignSelf: "flex-start",
+    backgroundColor: "#DBEAFE",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 20,
+    marginTop: 10,
+  },
+
+  level: {
+    color: "#2563EB",
+    fontWeight: "600",
+    fontSize: 12,
+  },
+
+  progressBackground: {
+    marginTop: 15,
+    height: 7,
+    backgroundColor: "#E5E7EB",
+    borderRadius: 10,
+    overflow: "hidden",
+  },
+
+  progress: {
+    height: "100%",
+    backgroundColor: "#2563EB",
+  },
+
+  progressText: {
+    marginTop: 8,
+    fontSize: 13,
+    color: "#6B7280",
+  },
+
+  footer: {
+    marginTop: 16,
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+
+  info: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  infoText: {
+    marginLeft: 4,
+    color: "#6B7280",
+    fontSize: 13,
+  },
+});

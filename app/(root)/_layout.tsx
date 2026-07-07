@@ -9,7 +9,7 @@ export default function AppLayout() {
   });
 
   if (!isLoaded) {
-    (
+    return (
       <SafeAreaView
         style={{
           backgroundColor: "#fff",
