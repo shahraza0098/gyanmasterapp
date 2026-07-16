@@ -14,13 +14,13 @@
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "foregroundImage": "./assets/icons/app-icon.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "monochromeImage": "./assets/icons/app-icon-mono.png"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.shahraza0098.GyanMaster"
+      "package": "com.nextlearn.gyanmaster"
     },
     "web": {
       "output": "static",
@@ -31,7 +31,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/icons/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff",
@@ -53,6 +53,7 @@
       "eas": {
         "projectId": "c72bcaaf-025a-4da6-b9f5-696c9f075879"
       }
-    }
+    },
+    "owner": "shahraza0098"
   }
 }

@@ -3,7 +3,7 @@ type AppEnv = "development" | "staging" | "production";
 const API_URL_BY_ENV: Record<AppEnv, string> = {
   development: "http://172.19.218.5:3000",
   staging: "https://staging.gyanmaster.com",
-  production: "https://gyanmaster.com",
+  production: "https://www.gyanmaster.com",
 };
 
 const rawAppEnv = process.env.EXPO_PUBLIC_APP_ENV;

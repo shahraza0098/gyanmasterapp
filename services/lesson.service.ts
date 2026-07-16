@@ -18,7 +18,7 @@ class LessonService {
   ): Promise<Lesson> {
     const response =
       await api.get<LessonResponse>(
-        `/lesson/${lessonId}`
+        `/student/lesson/${lessonId}`
       );
 
     return response.data.data;

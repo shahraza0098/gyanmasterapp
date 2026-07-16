@@ -10,7 +10,7 @@ export const setTokenGetter = (
 };
 
 const api = axios.create({
-  baseURL: `${API_URL}/api/student`,
+  baseURL: `${API_URL}/api`,
   timeout: 30000,
 });
 
@@ -25,5 +25,9 @@ api.interceptors.request.use(async (config) => {
 
   return config;
 });
+
+
+
+
 
 export default api;

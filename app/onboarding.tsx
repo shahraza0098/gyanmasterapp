@@ -1,8 +1,20 @@
 import { useState } from "react";
-import { ActivityIndicator, Alert, Pressable, SafeAreaView, Text, TextInput, View } from "react-native";
+import { 
+  ActivityIndicator, 
+  Alert, 
+  TouchableOpacity, 
+  Text, 
+  TextInput, 
+  View, 
+  StyleSheet, 
+  KeyboardAvoidingView, 
+  Platform, 
+  ScrollView 
+} from "react-native";
 import { router } from "expo-router";
 import { useAuth } from "@clerk/expo";
 import { API_URL } from "../config/api";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function OnboardingScreen() {
   const { getToken } = useAuth();
@@ -11,6 +23,9 @@ export default function OnboardingScreen() {
   const [phone, setPhone] = useState("");
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(false);
+
+  console.log("API_URL:", API_URL);
+  console.log("name:", name);
 
   const handleContinue = async () => {
     if (!name.trim() || !email.trim()) {
@@ -27,6 +42,8 @@ export default function OnboardingScreen() {
         return;
       }
 
+      console.log("Token:", token);
+      
       const response = await fetch(`${API_URL}/api/student/onboard`, {
         method: "POST",
         headers: {
@@ -42,6 +59,9 @@ export default function OnboardingScreen() {
       });
 
       const data = await response.json();
+      console.log("Response data:", data);
+
+      console.log("Status:", response.status);
 
       if (!response.ok) {
         throw new Error(data?.message || "Unable to save profile");
@@ -56,60 +76,225 @@ export default function OnboardingScreen() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
-      <View style={{ flex: 1, paddingHorizontal: 24, paddingTop: 40, paddingBottom: 24, justifyContent: "space-between" }}>
-        <View>
-          <Text style={{ fontSize: 32, fontWeight: "700", color: "#111827" }}>
-            Welcome to GyanMaster
-          </Text>
-          <Text style={{ marginTop: 10, fontSize: 16, color: "#6b7280", lineHeight: 24 }}>
-            Tell us a little about yourself so we can personalize your learning journey.
-          </Text>
+    <SafeAreaView style={styles.safeArea}>
+      {/* Decorative Background Blobs for Glassmorphism Context */}
+      <View style={[styles.blob, styles.blobTopLeft]} />
+      <View style={[styles.blob, styles.blobBottomRight]} />
+      <View style={[styles.blob, styles.blobCenter]} />
 
-          <View style={{ marginTop: 24, gap: 14 }}>
-            <TextInput
-              placeholder="Full name"
-              value={name}
-              onChangeText={setName}
-              style={{ borderWidth: 1, borderColor: "#d1d5db", borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12 }}
-            />
-            <TextInput
-              placeholder="Email"
-              value={email}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              onChangeText={setEmail}
-              style={{ borderWidth: 1, borderColor: "#d1d5db", borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12 }}
-            />
-            <TextInput
-              placeholder="Phone (optional)"
-              value={phone}
-              keyboardType="phone-pad"
-              onChangeText={setPhone}
-              style={{ borderWidth: 1, borderColor: "#d1d5db", borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12 }}
-            />
-            <TextInput
-              placeholder="Username (optional)"
-              value={username}
-              autoCapitalize="none"
-              onChangeText={setUsername}
-              style={{ borderWidth: 1, borderColor: "#d1d5db", borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12 }}
-            />
-          </View>
-        </View>
-
-        <Pressable
-          onPress={handleContinue}
-          disabled={loading}
-          style={{ backgroundColor: loading ? "#93c5fd" : "#2563eb", paddingVertical: 14, borderRadius: 14, alignItems: "center" }}
+      <KeyboardAvoidingView 
+        style={styles.keyboardAvoidingView} 
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
+        <ScrollView 
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
         >
-          {loading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={{ color: "#fff", fontSize: 16, fontWeight: "600" }}>Continue</Text>
-          )}
-        </Pressable>
-      </View>
+          <View>
+            <View style={styles.headerContainer}>
+              <Text style={styles.title}>Welcome to GyanMaster</Text>
+              <Text style={styles.subtitle}>
+                Tell us a little about yourself so we can personalize your learning journey.
+              </Text>
+            </View>
+
+            {/* Glassmorphism Card */}
+            <View style={styles.glassCard}>
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Full Name</Text>
+                <TextInput
+                  placeholder="John Doe"
+                  placeholderTextColor="#94A3B8"
+                  value={name}
+                  onChangeText={setName}
+                  style={styles.input}
+                />
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Email Address</Text>
+                <TextInput
+                  placeholder="john@example.com"
+                  placeholderTextColor="#94A3B8"
+                  value={email}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  onChangeText={setEmail}
+                  style={styles.input}
+                />
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Phone <Text style={styles.optional}>(Optional)</Text></Text>
+                <TextInput
+                  placeholder="+1 234 567 8900"
+                  placeholderTextColor="#94A3B8"
+                  value={phone}
+                  keyboardType="phone-pad"
+                  onChangeText={setPhone}
+                  style={styles.input}
+                />
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Username <Text style={styles.optional}>(Optional)</Text></Text>
+                <TextInput
+                  placeholder="@johndoe"
+                  placeholderTextColor="#94A3B8"
+                  value={username}
+                  autoCapitalize="none"
+                  onChangeText={setUsername}
+                  style={styles.input}
+                />
+              </View>
+            </View>
+          </View>
+
+          {/* Replaced Pressable with TouchableOpacity */}
+          <TouchableOpacity
+            onPress={handleContinue}
+            disabled={loading}
+            activeOpacity={0.8}
+            style={[styles.button, loading && styles.buttonDisabled]}
+          >
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.buttonText}>Complete Profile</Text>
+            )}
+          </TouchableOpacity>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#F8FAFC",
+  },
+  keyboardAvoidingView: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingHorizontal: 24,
+    paddingTop: 40,
+    paddingBottom: 40,
+    justifyContent: "space-between",
+  },
+  /* Background Decorative Blobs */
+  blob: {
+    position: "absolute",
+    width: 300,
+    height: 300,
+    borderRadius: 150,
+    opacity: 0.3,
+  },
+  blobTopLeft: {
+    top: -50,
+    left: -80,
+    backgroundColor: "#93C5FD",
+  },
+  blobBottomRight: {
+    bottom: -100,
+    right: -50,
+    backgroundColor: "#C4B5FD",
+  },
+  blobCenter: {
+    top: "40%",
+    left: "10%",
+    backgroundColor: "#A7F3D0",
+    width: 250,
+    height: 250,
+    opacity: 0.2,
+  },
+  /* Header Styles */
+  headerContainer: {
+    marginBottom: 32,
+    marginTop: 10,
+  },
+  title: {
+    fontSize: 34,
+    fontWeight: "800",
+    color: "#0F172A",
+    letterSpacing: -0.5,
+  },
+  subtitle: {
+    marginTop: 12,
+    fontSize: 16,
+    color: "#64748B",
+    lineHeight: 24,
+    fontWeight: "400",
+  },
+  /* Glassmorphism Card Style */
+  glassCard: {
+    backgroundColor: "rgba(255, 255, 255, 0.8)",
+    borderRadius: 24,
+    padding: 24,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 1)",
+    // iOS Shadow
+    shadowColor: "#64748B",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.08,
+    shadowRadius: 24,
+    // Android Shadow
+    elevation: 4,
+    marginBottom: 32,
+  },
+  inputGroup: {
+    marginBottom: 20,
+  },
+  label: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#475569",
+    marginBottom: 8,
+    marginLeft: 4,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
+  optional: {
+    textTransform: "none",
+    fontWeight: "400",
+    color: "#94A3B8",
+  },
+  input: {
+    backgroundColor: "rgba(255, 255, 255, 0.9)",
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    fontSize: 16,
+    color: "#1E293B",
+  },
+  /* Button Styles */
+  button: {
+    backgroundColor: "#4F46E5",
+    paddingVertical: 18,
+    borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 10,
+    // Button Shadow
+    shadowColor: "#4F46E5",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  buttonDisabled: {
+    backgroundColor: "#A5B4FC",
+    shadowOpacity: 0.1,
+    elevation: 2,
+  },
+  buttonText: {
+    color: "#ffffff",
+    fontSize: 17,
+    fontWeight: "700",
+    letterSpacing: 0.5,
+  },
+});

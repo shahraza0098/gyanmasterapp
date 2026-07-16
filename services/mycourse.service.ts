@@ -17,7 +17,7 @@ interface ApiResponse<T> {
  */
 export async function getMyCourses(): Promise<MyCoursesResponse> {
   const response = await api.get<ApiResponse<MyCoursesResponse>>(
-    "/my-courses"
+    "/student/my-courses"
   );
 
   return response.data.data;
@@ -26,7 +26,7 @@ export async function getMyCourses(): Promise<MyCoursesResponse> {
 
 export async function searchMyCourses(search: string) {
   const response = await api.get<ApiResponse<MyCoursesResponse>>(
-    "/my-courses",
+    "/student/my-courses",
     {
       params: {
         search,

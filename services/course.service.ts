@@ -7,7 +7,7 @@ class CourseService {
     courseId: string
   ): Promise<CourseDetails> {
     const response = await api.get(
-      `/course/${courseId}`
+      `/student/course/${courseId}`
     );
 
     return response.data.data;

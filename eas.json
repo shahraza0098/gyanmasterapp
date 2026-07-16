@@ -6,13 +6,32 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      // "env": {
+      //   "EXPO_PUBLIC_APP_ENV": "development",
+      //   "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY": "pk_live_Y2xlcmsuZ3lhbm1hc3Rlci5jb20k",
+      //   "EXPO_PUBLIC_API_URL": "https://www.gyanmaster.com",
+      //   "CLERK_SIGN_UP_FORCE_REDIRECT_URL": "/onboarding",
+      //   "CLERK_SIGN_IN_FALLBACK_REDIRECT_URL": "/index"
+      // }
     },
     "preview": {
       "distribution": "internal"
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_APP_ENV": "production",
+        "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY": "pk_live_Y2xlcmsuZ3lhbm1hc3Rlci5jb20k",
+        "EXPO_PUBLIC_API_URL": "https://www.gyanmaster.com",
+        "CLERK_SIGN_UP_FORCE_REDIRECT_URL": "/onboarding",
+        "CLERK_SIGN_IN_FALLBACK_REDIRECT_URL": "/index"
+      }
+    },
+    "apk":{
+       "android": {
+        "buildType": "apk"
+      }
     }
   },
   "submit": {
