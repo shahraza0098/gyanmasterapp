@@ -79,11 +79,19 @@ export default function SubscriptionScreen() {
 
     setStatus("checkout");
     try {
+      const key = data.keyId ?? data.key;
+      const trialAmount = data.trialAmount ?? data.plan?.trialAmount ?? PLAN.trialAmount;
+      const monthlyAmount = data.monthlyAmount ?? data.plan?.price ?? PLAN.monthlyAmount;
+
+      if (!key || !data.subscriptionId) {
+        throw new Error("Missing Razorpay checkout details from server.");
+      }
+
       const result = await RazorpayCheckout.open({
-        key: data.keyId,
+        key,
         subscription_id: data.subscriptionId,
         name: "Premium",
-        description: `₹${data.trialAmount} today, then ₹${data.monthlyAmount}/mo`,
+        description: `₹${trialAmount} today, then ₹${monthlyAmount}/mo`,
         theme: { color: COLORS.accent },
       });
 
@@ -100,10 +108,23 @@ export default function SubscriptionScreen() {
         setStatus("error");
         setMessage("Payment went through but couldn't be verified. Contact support.");
       }
-    } catch {
+    } catch (error) {
       // Customer closed checkout or the payment failed — not a hard
       // error worth alarming them with, just reset.
-      setStatus("idle");
+      const checkoutMessage =
+        error instanceof Error
+          ? error.message
+          : "Razorpay checkout was cancelled.";
+
+      const normalizedMessage =
+        checkoutMessage.toLowerCase();
+      const userCancelled =
+        normalizedMessage.includes("cancel") ||
+        normalizedMessage.includes("dismiss") ||
+        normalizedMessage.includes("closed");
+
+      setStatus(userCancelled ? "idle" : "error");
+      setMessage(userCancelled ? null : checkoutMessage);
     }
   }, [create, createError]);
 
@@ -275,9 +296,9 @@ function SuccessState({ onDone }: { onDone: () => void }) {
         <View style={styles.successIcon}>
           <Feather name="check" size={28} color={COLORS.bg} />
         </View>
-        <Text style={styles.successTitle}>You're in</Text>
+        <Text style={styles.successTitle}>You&apos;re in</Text>
         <Text style={styles.successBody}>
-          Your {PLAN.trialDays}-day trial has started. We'll remind you before
+          Your {PLAN.trialDays}-day trial has started. We&apos;ll remind you before
           the first ₹{PLAN.monthlyAmount} charge.
         </Text>
         <Pressable onPress={onDone} style={styles.cta}>

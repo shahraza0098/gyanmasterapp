@@ -3,10 +3,20 @@ import { AxiosError } from "axios";
 
 export interface CreateSubscriptionResponse {
   subscriptionId: string;
-  keyId: string;
-  trialAmount: number;
-  monthlyAmount: number;
-  trialEndAt: string;
+  key?: string;
+  keyId?: string;
+  trialAmount?: number;
+  monthlyAmount?: number;
+  trialDays?: number;
+  trialEndAt?: string;
+  plan?: {
+    id: string;
+    name: string;
+    description: string;
+    price: number;
+    trialAmount: number;
+    trialDays: number;
+  };
 }
 
 export interface VerifySubscriptionPayload {
@@ -21,21 +31,29 @@ export interface VerifySubscriptionResponse {
 }
 
 export interface SubscriptionConflictError {
-  error: string;
-  status: string; // e.g. "ACTIVE", "AUTHENTICATED"
+  error?: string;
+  message?: string;
+  status?: string; // e.g. "ACTIVE", "AUTHENTICATED"
+}
+
+interface CreateSubscriptionApiResponse {
+  message: string;
+  data: CreateSubscriptionResponse;
 }
 
 export async function createSubscription(planId?: string) {
   try {
-    const response = await api.post<CreateSubscriptionResponse>(
+    const response = await api.post<CreateSubscriptionApiResponse>(
       "/subscription/create",
       planId ? { planId } : {}
     );
-    return response.data;
+    return response.data.data;
   } catch (err) {
     const axiosErr = err as AxiosError<SubscriptionConflictError>;
     if (axiosErr.response?.status === 409) {
-      throw new Error(`ALREADY_SUBSCRIBED:${axiosErr.response.data.status}`);
+      const existingStatus =
+        axiosErr.response.data?.status ?? "UNKNOWN";
+      throw new Error(`ALREADY_SUBSCRIBED:${existingStatus}`);
     }
     throw err;
   }
@@ -43,7 +61,7 @@ export async function createSubscription(planId?: string) {
 
 export async function verifySubscription(payload: VerifySubscriptionPayload) {
   const response = await api.post<VerifySubscriptionResponse>(
-    "/api/subscription/verify",
+    "/subscription/verify",
     payload
   );
   return response.data;
@@ -51,7 +69,7 @@ export async function verifySubscription(payload: VerifySubscriptionPayload) {
 
 export async function cancelSubscription() {
   const response = await api.post<{ ok: boolean }>(
-    "/api/subscription/cancel"
+    "/subscription/cancel"
   );
   return response.data;
 }
