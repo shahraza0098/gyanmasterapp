@@ -28,6 +28,7 @@ export interface VerifySubscriptionPayload {
 export interface VerifySubscriptionResponse {
   ok: boolean;
   status: string;
+  message?: string;
 }
 
 export interface SubscriptionConflictError {
@@ -60,11 +61,26 @@ export async function createSubscription(planId?: string) {
 }
 
 export async function verifySubscription(payload: VerifySubscriptionPayload) {
-  const response = await api.post<VerifySubscriptionResponse>(
-    "/subscription/verify",
-    payload
-  );
-  return response.data;
+  try {
+    const response = await api.post<VerifySubscriptionResponse>(
+      "/subscription/verify",
+      payload,
+      { timeout: 10000 }
+    );
+    return response.data;
+  } catch (err) {
+    const axiosErr = err as AxiosError<{ error?: string; message?: string }>;
+
+    return {
+      ok: false,
+      status: "ERROR",
+      message:
+        axiosErr.response?.data?.message ??
+        axiosErr.response?.data?.error ??
+        axiosErr.message ??
+        "Payment verification failed",
+    };
+  }
 }
 
 export async function cancelSubscription() {

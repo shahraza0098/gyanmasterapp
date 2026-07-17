@@ -86,6 +86,7 @@ export default function SubscriptionScreen() {
       if (!key || !data.subscriptionId) {
         throw new Error("Missing Razorpay checkout details from server.");
       }
+console.log("Opening Razorpay");
 
       const result = await RazorpayCheckout.open({
         key,
@@ -95,12 +96,17 @@ export default function SubscriptionScreen() {
         theme: { color: COLORS.accent },
       });
 
+      console.log("result coming: ", result)
       setStatus("verifying");
+
+      console.log("Calling verify API");
       const verified = await verifySubscription({
         razorpay_payment_id: result.razorpay_payment_id,
         razorpay_subscription_id: result.razorpay_subscription_id,
         razorpay_signature: result.razorpay_signature,
       });
+
+      console.log("Verify response", verified);
 
       if (verified?.ok) {
         setStatus("success");
@@ -111,6 +117,8 @@ export default function SubscriptionScreen() {
     } catch (error) {
       // Customer closed checkout or the payment failed — not a hard
       // error worth alarming them with, just reset.
+
+      console.log("Checkout error", error);
       const checkoutMessage =
         error instanceof Error
           ? error.message
