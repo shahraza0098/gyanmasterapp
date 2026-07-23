@@ -1,9 +1,11 @@
+
+
+
+// //gemini UI
+
+
 // import React, { useMemo } from "react";
-// import {
-//   StyleSheet,
-//   Text,
-//   View,
-// } from "react-native";
+// import { StyleSheet, Text, View } from "react-native";
 
 // interface LessonProgressProps {
 //   watchedSeconds: number;
@@ -18,57 +20,31 @@
 // }: LessonProgressProps) {
 //   const progress = useMemo(() => {
 //     if (duration <= 0) return 0;
-
-//     return Math.min(
-//       watchedSeconds / duration,
-//       1
-//     );
+//     return Math.min(watchedSeconds / duration, 1);
 //   }, [watchedSeconds, duration]);
 
-//   const percentage = Math.round(
-//     progress * 100
-//   );
+//   const percentage = Math.round(progress * 100);
 
-//   const formatTime = (
-//     seconds: number
-//   ) => {
+//   const formatTime = (seconds: number) => {
 //     const hrs = Math.floor(seconds / 3600);
-
-//     const mins = Math.floor(
-//       (seconds % 3600) / 60
-//     );
-
-//     const secs = Math.floor(
-//       seconds % 60
-//     );
+//     const mins = Math.floor((seconds % 3600) / 60);
+//     const secs = Math.floor(seconds % 60);
 
 //     if (hrs > 0) {
-//       return `${hrs}:${String(
-//         mins
-//       ).padStart(2, "0")}:${String(
-//         secs
-//       ).padStart(2, "0")}`;
+//       return `${hrs}:${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
 //     }
 
-//     return `${mins}:${String(
-//       secs
-//     ).padStart(2, "0")}`;
+//     return `${mins}:${String(secs).padStart(2, "0")}`;
 //   };
 
 //   return (
 //     <View style={styles.container}>
 //       <View style={styles.header}>
-//         <Text style={styles.title}>
-//           Lesson Progress
-//         </Text>
+//         <Text style={styles.title}>Lesson Progress</Text>
 
 //         {completed && (
 //           <View style={styles.badge}>
-//             <Text
-//               style={styles.badgeText}
-//             >
-//               ✓ Completed
-//             </Text>
+//             <Text style={styles.badgeText}>✓ Completed</Text>
 //           </View>
 //         )}
 //       </View>
@@ -77,27 +53,17 @@
 //         <View
 //           style={[
 //             styles.progressFill,
-//             {
-//               width: `${percentage}%`,
-//             },
+//             { width: `${percentage}%` },
 //           ]}
 //         />
 //       </View>
 
 //       <View style={styles.footer}>
 //         <Text style={styles.time}>
-//           {formatTime(
-//             watchedSeconds
-//           )}{" "}
-//           /{" "}
-//           {formatTime(duration)}
+//           {formatTime(watchedSeconds)} / {formatTime(duration)}
 //         </Text>
 
-//         <Text
-//           style={styles.percent}
-//         >
-//           {percentage}%
-//         </Text>
+//         <Text style={styles.percent}>{percentage}%</Text>
 //       </View>
 //     </View>
 //   );
@@ -105,125 +71,80 @@
 
 // const styles = StyleSheet.create({
 //   container: {
-//     marginTop: 24,
-
-//     padding: 18,
-
-//     borderRadius: 18,
-
 //     backgroundColor: "#FFFFFF",
+//     borderRadius: 20,
+//     padding: 20,
+    
+//     // Subtle border for clean definition
+//     borderWidth: 1,
+//     borderColor: "#F1F5F9",
 
-//     shadowColor: "#000",
+//     // Elegant, soft shadow (iOS)
+//     shadowColor: "#0F172A",
+//     shadowOffset: { width: 0, height: 6 },
+//     shadowOpacity: 0.03,
+//     shadowRadius: 12,
 
-//     shadowOpacity: 0.05,
-
-//     shadowRadius: 10,
-
-//     shadowOffset: {
-//       width: 0,
-//       height: 4,
-//     },
-
-//     elevation: 3,
+//     // Elevation (Android)
+//     elevation: 2,
 //   },
-
 //   header: {
 //     flexDirection: "row",
-
-//     justifyContent:
-//       "space-between",
-
+//     justifyContent: "space-between",
 //     alignItems: "center",
-
 //     marginBottom: 16,
 //   },
-
 //   title: {
-//     fontSize: 18,
-
-//     fontFamily:
-//       "Poppins-SemiBold",
-
-//     color: "#0F172A",
+//     fontSize: 16,
+//     fontFamily: "Poppins-SemiBold",
+//     color: "#1E293B", // Deep slate
+//     letterSpacing: -0.2,
 //   },
-
 //   badge: {
-//     backgroundColor:
-//       "#DCFCE7",
-
-//     paddingHorizontal: 12,
-
-//     paddingVertical: 6,
-
-//     borderRadius: 999,
+//     backgroundColor: "#ECFDF5", // Soft emerald background
+//     paddingHorizontal: 10,
+//     paddingVertical: 4,
+//     borderRadius: 12,
 //   },
-
 //   badgeText: {
-//     color: "#16A34A",
-
+//     color: "#10B981", // Crisp emerald text
 //     fontSize: 12,
-
-//     fontFamily:
-//       "Poppins-SemiBold",
+//     fontFamily: "Poppins-SemiBold",
+//     letterSpacing: 0.2,
 //   },
-
 //   progressBar: {
-//     height: 10,
-
-//     borderRadius: 999,
-
+//     height: 8, // Slimmed down for elegance
+//     borderRadius: 4,
 //     overflow: "hidden",
-
-//     backgroundColor:
-//       "#E2E8F0",
+//     backgroundColor: "#F1F5F9", // Lighter, softer track color
 //   },
-
 //   progressFill: {
 //     height: "100%",
-
-//     backgroundColor:
-//       "#2563EB",
-
-//     borderRadius: 999,
+//     backgroundColor: "#3B82F6", // Modern primary blue
+//     borderRadius: 4,
 //   },
-
 //   footer: {
 //     marginTop: 12,
-
 //     flexDirection: "row",
-
-//     justifyContent:
-//       "space-between",
+//     justifyContent: "space-between",
+//     alignItems: "center",
 //   },
-
 //   time: {
 //     fontSize: 13,
-
-//     color: "#64748B",
-
-//     fontFamily:
-//       "Poppins-Medium",
+//     color: "#64748B", // Slate gray
+//     fontFamily: "Poppins-Medium",
 //   },
-
 //   percent: {
 //     fontSize: 14,
-
-//     color: "#2563EB",
-
-//     fontFamily:
-//       "Poppins-SemiBold",
+//     color: "#3B82F6", // Matches progress bar
+//     fontFamily: "Poppins-SemiBold",
 //   },
 // });
 
 
 
 
-
-
-
-
-
-//gemini UI
+//claide
 
 
 import React, { useMemo } from "react";
@@ -259,33 +180,40 @@ export default function LessonProgress({
     return `${mins}:${String(secs).padStart(2, "0")}`;
   };
 
+  const accent = completed ? "#10B981" : "#F97316";
+  const accentBg = completed ? "#ECFDF5" : "#FFF1E6";
+
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Lesson Progress</Text>
-
-        {completed && (
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>✓ Completed</Text>
+      <View style={styles.row}>
+        <View style={styles.leftCol}>
+          <View style={styles.headerRow}>
+            <Text style={styles.title}>Progress</Text>
+            {completed && (
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>Completed</Text>
+              </View>
+            )}
           </View>
-        )}
-      </View>
 
-      <View style={styles.progressBar}>
-        <View
-          style={[
-            styles.progressFill,
-            { width: `${percentage}%` },
-          ]}
-        />
-      </View>
+          <View style={styles.progressBar}>
+            <View
+              style={[
+                styles.progressFill,
+                { width: `${percentage}%`, backgroundColor: accent },
+              ]}
+            />
+          </View>
 
-      <View style={styles.footer}>
-        <Text style={styles.time}>
-          {formatTime(watchedSeconds)} / {formatTime(duration)}
-        </Text>
+          <Text style={styles.time}>
+            {formatTime(watchedSeconds)} / {formatTime(duration)}
+          </Text>
+        </View>
 
-        <Text style={styles.percent}>{percentage}%</Text>
+        <View style={[styles.circleBadge, { backgroundColor: accentBg, borderColor: accent }]}>
+          <Text style={[styles.circlePercent, { color: accent }]}>{percentage}</Text>
+          <Text style={[styles.circleSign, { color: accent }]}>%</Text>
+        </View>
       </View>
     </View>
   );
@@ -293,72 +221,74 @@ export default function LessonProgress({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 20,
-    padding: 20,
-    
-    // Subtle border for clean definition
-    borderWidth: 1,
-    borderColor: "#F1F5F9",
-
-    // Elegant, soft shadow (iOS)
-    shadowColor: "#0F172A",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.03,
-    shadowRadius: 12,
-
-    // Elevation (Android)
-    elevation: 2,
+    paddingTop: 4,
   },
-  header: {
+  row: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 16,
+  },
+  leftCol: {
+    flex: 1,
+    marginRight: 18,
+  },
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 10,
   },
   title: {
-    fontSize: 16,
+    fontSize: 12.5,
     fontFamily: "Poppins-SemiBold",
-    color: "#1E293B", // Deep slate
-    letterSpacing: -0.2,
+    color: "#8A8578",
+    textTransform: "uppercase",
+    letterSpacing: 0.6,
   },
   badge: {
-    backgroundColor: "#ECFDF5", // Soft emerald background
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
+    backgroundColor: "#ECFDF5",
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
   },
   badgeText: {
-    color: "#10B981", // Crisp emerald text
-    fontSize: 12,
+    color: "#10B981",
+    fontSize: 10.5,
     fontFamily: "Poppins-SemiBold",
-    letterSpacing: 0.2,
   },
   progressBar: {
-    height: 8, // Slimmed down for elegance
-    borderRadius: 4,
+    height: 5,
+    borderRadius: 999,
     overflow: "hidden",
-    backgroundColor: "#F1F5F9", // Lighter, softer track color
+    backgroundColor: "#EFEAE0",
   },
   progressFill: {
     height: "100%",
-    backgroundColor: "#3B82F6", // Modern primary blue
-    borderRadius: 4,
-  },
-  footer: {
-    marginTop: 12,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    borderRadius: 999,
   },
   time: {
-    fontSize: 13,
-    color: "#64748B", // Slate gray
+    marginTop: 8,
+    fontSize: 12,
+    color: "#A9A395",
     fontFamily: "Poppins-Medium",
   },
-  percent: {
-    fontSize: 14,
-    color: "#3B82F6", // Matches progress bar
+  circleBadge: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    borderWidth: 2,
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
+  },
+  circlePercent: {
+    fontSize: 17,
+    fontFamily: "Poppins-Bold",
+    letterSpacing: -0.5,
+  },
+  circleSign: {
+    fontSize: 10,
     fontFamily: "Poppins-SemiBold",
+    marginLeft: 1,
+    marginTop: 4,
   },
 });

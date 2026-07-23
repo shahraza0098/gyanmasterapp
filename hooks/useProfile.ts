@@ -21,10 +21,7 @@ export function useProfile() {
     useCallback(async () => {
       try {
         setError("");
-
-        const data =
-          await getProfile();
-
+        const data =await getProfile();
         setProfile(data);
       } catch (error: any) {
         setError(
