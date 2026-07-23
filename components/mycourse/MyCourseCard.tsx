@@ -12,6 +12,7 @@ import { Feather } from "@expo/vector-icons";
 import { MyCourse } from "@/types/MyCourse";
 
 import MyCourseProgress from "./MyCourseProgress";
+import { useAppTheme } from "@/providers/ThemeProvider";
 
 interface Props {
   course: MyCourse;
@@ -29,10 +30,11 @@ export default function MyCourseCard({
   onContinue,
   onCertificate,
 }: Props) {
+  const theme = useAppTheme();
   return (
     <Pressable
       onPress={onPress}
-      style={styles.card}
+      style={[styles.card, { backgroundColor: theme.surface, borderColor: theme.border }]}
     >
       <Image
         source={{
@@ -44,12 +46,12 @@ export default function MyCourseCard({
       <View style={styles.content}>
         <Text
           numberOfLines={2}
-          style={styles.title}
+          style={[styles.title, { color: theme.text }]}
         >
           {course.title}
         </Text>
 
-        <Text style={styles.level}>
+        <Text style={[styles.level, { color: theme.textMuted }]}> 
           {course.level}
         </Text>
 
@@ -59,13 +61,13 @@ export default function MyCourseCard({
               style={styles.progressHeader}
             >
               <Text
-                style={styles.progressText}
+                style={[styles.progressText, { color: theme.primary }]}
               >
                 {course.progress}%
               </Text>
 
               <Text
-                style={styles.lessonCount}
+                style={[styles.lessonCount, { color: theme.textMuted }]}
               >
                 {course.completedLessons}/
                 {course.totalLessons}
@@ -78,7 +80,7 @@ export default function MyCourseCard({
 
             <Pressable
               onPress={onContinue}
-              style={styles.button}
+              style={[styles.button, { backgroundColor: theme.primary }]}
             >
               <Feather
                 name="play-circle"

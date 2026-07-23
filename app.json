@@ -42,7 +42,8 @@
       ],
       "expo-secure-store",
       "@clerk/expo",
-      "expo-video"
+      "expo-video",
+      "expo-sqlite"
     ],
     "experiments": {
       "typedRoutes": true,

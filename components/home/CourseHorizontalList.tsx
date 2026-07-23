@@ -3,6 +3,7 @@ import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
 
 import { CourseCard } from "@/types/home";
+import { useAppTheme } from "@/providers/ThemeProvider";
 
 interface Props {
   title: string;
@@ -28,11 +29,12 @@ export default function CourseHorizontalList({
   courses,
   onPress,
 }: Props) {
+  const theme = useAppTheme();
   if (!courses.length) return null;
 
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>{title}</Text>
+      <Text style={[styles.heading, { color: theme.text }]}>{title}</Text>
 
       <FlatList
         horizontal
@@ -42,7 +44,7 @@ export default function CourseHorizontalList({
         contentContainerStyle={styles.list}
         renderItem={({ item }) => (
           <Pressable
-            style={styles.card}
+            style={[styles.card, { backgroundColor: theme.surface }]}
             onPress={() => onPress(item)}
           >
             <Image
@@ -54,22 +56,22 @@ export default function CourseHorizontalList({
             <View style={styles.content}>
               <Text
                 numberOfLines={2}
-                style={styles.title}
+                style={[styles.title, { color: theme.text }]}
               >
                 {item.title}
               </Text>
 
-              <Text style={styles.category}>
+              <Text style={[styles.category, { color: theme.textMuted }]}>
                 {item.category.name}
               </Text>
 
-              <View style={styles.levelContainer}>
-                <Text style={styles.level}>
+              <View style={[styles.levelContainer, { backgroundColor: theme.primarySoft }]}>
+                <Text style={[styles.level, { color: theme.primary }]}>
                   {item.level}
                 </Text>
               </View>
 
-              <View style={styles.progressBackground}>
+              <View style={[styles.progressBackground, { backgroundColor: theme.surfaceMuted }]}>
                 <View
                   style={[
                     styles.progress,
@@ -80,7 +82,7 @@ export default function CourseHorizontalList({
                 />
               </View>
 
-              <Text style={styles.progressText}>
+              <Text style={[styles.progressText, { color: theme.textMuted }]}>
                 {item.progress}% Completed
               </Text>
 
@@ -89,10 +91,10 @@ export default function CourseHorizontalList({
                   <Ionicons
                     name="book-outline"
                     size={15}
-                    color="#666"
+                    color={theme.textMuted}
                   />
 
-                  <Text style={styles.infoText}>
+                  <Text style={[styles.infoText, { color: theme.textMuted }]}>
                     {item.totalLessons}
                   </Text>
                 </View>
@@ -101,10 +103,10 @@ export default function CourseHorizontalList({
                   <Ionicons
                     name="time-outline"
                     size={15}
-                    color="#666"
+                    color={theme.textMuted}
                   />
 
-                  <Text style={styles.infoText}>
+                  <Text style={[styles.infoText, { color: theme.textMuted }]}>
                     {formatDuration(item.totalDuration)}
                   </Text>
                 </View>

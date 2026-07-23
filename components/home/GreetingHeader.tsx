@@ -78,6 +78,7 @@
 
 import { View, Text, StyleSheet } from "react-native";
 import { Image } from "expo-image";
+import { useAppTheme } from "@/providers/ThemeProvider";
 
 interface GreetingHeaderProps {
   name?: string;
@@ -88,6 +89,7 @@ export default function GreetingHeader({
   name,
   image,
 }: GreetingHeaderProps) {
+  const theme = useAppTheme();
   // --- Logic remains completely unchanged ---
   const hour = new Date().getHours();
 
@@ -103,16 +105,16 @@ export default function GreetingHeader({
   return (
     <View style={styles.container}>
       <View style={styles.textContainer}>
-        <Text style={styles.greeting}>
+        <Text style={[styles.greeting, { color: theme.textMuted }]}>
           {greeting} 👋
         </Text>
 
-        <Text style={styles.name}>
+        <Text style={[styles.name, { color: theme.text }]}>
           {name ?? "Student"}
         </Text>
       </View>
 
-      <View style={styles.avatarRing}>
+      <View style={[styles.avatarRing, { backgroundColor: theme.surface, shadowColor: theme.text }]}>
         <Image
           source={
             image

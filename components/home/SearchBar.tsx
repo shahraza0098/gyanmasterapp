@@ -56,6 +56,7 @@
 
 import { View, TextInput, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useAppTheme } from "@/providers/ThemeProvider";
 
 interface SearchBarProps {
   value: string;
@@ -66,21 +67,22 @@ export default function SearchBar({
   value,
   onChangeText,
 }: SearchBarProps) {
+  const theme = useAppTheme();
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.surface, borderColor: theme.border, shadowColor: theme.text }]}>
       <Ionicons
         name="search"
         size={22}
-        color="#94A3B8" // Updated to a softer, modern slate color
+        color={theme.textMuted}
       />
 
       <TextInput
         placeholder="Search courses..."
         value={value}
         onChangeText={onChangeText}
-        style={styles.input}
-        placeholderTextColor="#94A3B8"
-        selectionColor="#2563EB" // Matches the brand blue from your loading state
+        style={[styles.input, { color: theme.text }]}
+        placeholderTextColor={theme.textMuted}
+        selectionColor={theme.primary}
       />
     </View>
   );

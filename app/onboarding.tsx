@@ -15,8 +15,10 @@ import { router } from "expo-router";
 import { useAuth } from "@clerk/expo";
 import { API_URL } from "../config/api";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useAppTheme } from "@/providers/ThemeProvider";
 
 export default function OnboardingScreen() {
+  const theme = useAppTheme();
   const { getToken } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -76,7 +78,7 @@ export default function OnboardingScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.background }]}>
       {/* Decorative Background Blobs for Glassmorphism Context */}
       <View style={[styles.blob, styles.blobTopLeft]} />
       <View style={[styles.blob, styles.blobBottomRight]} />
@@ -92,59 +94,59 @@ export default function OnboardingScreen() {
         >
           <View>
             <View style={styles.headerContainer}>
-              <Text style={styles.title}>Welcome to GyanMaster</Text>
-              <Text style={styles.subtitle}>
+              <Text style={[styles.title, { color: theme.text }]}>Welcome to GyanMaster</Text>
+              <Text style={[styles.subtitle, { color: theme.textMuted }]}>
                 Tell us a little about yourself so we can personalize your learning journey.
               </Text>
             </View>
 
             {/* Glassmorphism Card */}
-            <View style={styles.glassCard}>
+            <View style={[styles.glassCard, { backgroundColor: theme.surface, borderColor: theme.border, shadowColor: theme.text }]}>
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Full Name</Text>
+                <Text style={[styles.label, { color: theme.textMuted }]}>Full Name</Text>
                 <TextInput
                   placeholder="John Doe"
-                  placeholderTextColor="#94A3B8"
+                  placeholderTextColor={theme.textMuted}
                   value={name}
                   onChangeText={setName}
-                  style={styles.input}
+                  style={[styles.input, { backgroundColor: theme.surfaceMuted, borderColor: theme.border, color: theme.text }]}
                 />
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Email Address</Text>
+                <Text style={[styles.label, { color: theme.textMuted }]}>Email Address</Text>
                 <TextInput
                   placeholder="john@example.com"
-                  placeholderTextColor="#94A3B8"
+                  placeholderTextColor={theme.textMuted}
                   value={email}
                   keyboardType="email-address"
                   autoCapitalize="none"
                   onChangeText={setEmail}
-                  style={styles.input}
+                  style={[styles.input, { backgroundColor: theme.surfaceMuted, borderColor: theme.border, color: theme.text }]}
                 />
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Phone <Text style={styles.optional}>(Optional)</Text></Text>
+                <Text style={[styles.label, { color: theme.textMuted }]}>Phone <Text style={[styles.optional, { color: theme.textMuted }]}>(Optional)</Text></Text>
                 <TextInput
                   placeholder="+1 234 567 8900"
-                  placeholderTextColor="#94A3B8"
+                  placeholderTextColor={theme.textMuted}
                   value={phone}
                   keyboardType="phone-pad"
                   onChangeText={setPhone}
-                  style={styles.input}
+                  style={[styles.input, { backgroundColor: theme.surfaceMuted, borderColor: theme.border, color: theme.text }]}
                 />
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Username <Text style={styles.optional}>(Optional)</Text></Text>
+                <Text style={[styles.label, { color: theme.textMuted }]}>Username <Text style={[styles.optional, { color: theme.textMuted }]}>(Optional)</Text></Text>
                 <TextInput
                   placeholder="@johndoe"
-                  placeholderTextColor="#94A3B8"
+                  placeholderTextColor={theme.textMuted}
                   value={username}
                   autoCapitalize="none"
                   onChangeText={setUsername}
-                  style={styles.input}
+                  style={[styles.input, { backgroundColor: theme.surfaceMuted, borderColor: theme.border, color: theme.text }]}
                 />
               </View>
             </View>
@@ -155,7 +157,7 @@ export default function OnboardingScreen() {
             onPress={handleContinue}
             disabled={loading}
             activeOpacity={0.8}
-            style={[styles.button, loading && styles.buttonDisabled]}
+            style={[styles.button, { backgroundColor: loading ? "#93C5FD" : theme.primary }, loading && styles.buttonDisabled]}
           >
             {loading ? (
               <ActivityIndicator color="#fff" />

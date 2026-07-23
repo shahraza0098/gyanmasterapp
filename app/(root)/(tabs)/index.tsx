@@ -180,8 +180,10 @@ import SearchBar from "@/components/home/SearchBar";
 import ContinueLearningCard from "@/components/home/ContinueLearningCard";
 import CategoryList from "@/components/home/CategoryList";
 import CourseHorizontalList from "@/components/home/CourseHorizontalList";
+import { useAppTheme } from "@/providers/ThemeProvider";
 
 export default function HomeScreen() {
+  const theme = useAppTheme();
   const {
     user,
     continueLearning,
@@ -199,11 +201,11 @@ export default function HomeScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.center}>
-        <StatusBar barStyle="dark-content" />
+      <SafeAreaView style={[styles.center, { backgroundColor: theme.background }]}>
+        <StatusBar barStyle={theme.isDark ? "light-content" : "dark-content"} />
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#2563EB" />
-          <Text style={styles.loadingText}>Curating your experience...</Text>
+          <ActivityIndicator size="large" color={theme.primary} />
+          <Text style={[styles.loadingText, { color: theme.textMuted }]}>Curating your experience...</Text>
         </View>
       </SafeAreaView>
     );
@@ -211,11 +213,11 @@ export default function HomeScreen() {
 
   if (error) {
     return (
-      <SafeAreaView style={styles.center}>
-        <StatusBar barStyle="dark-content" />
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorTitle}>Oops! Something went wrong</Text>
-          <Text style={styles.errorText}>{error}</Text>
+      <SafeAreaView style={[styles.center, { backgroundColor: theme.background }]}>
+        <StatusBar barStyle={theme.isDark ? "light-content" : "dark-content"} />
+        <View style={[styles.errorContainer, { backgroundColor: theme.dangerSoft, borderColor: theme.danger }]}>
+          <Text style={[styles.errorTitle, { color: theme.danger }]}>Oops! Something went wrong</Text>
+          <Text style={[styles.errorText, { color: theme.danger }]}>{error}</Text>
         </View>
       </SafeAreaView>
     );
@@ -224,8 +226,8 @@ export default function HomeScreen() {
   console.log("featuredCourses", featuredCourses);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
+      <StatusBar barStyle={theme.isDark ? "light-content" : "dark-content"} backgroundColor={theme.background} />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.content}
@@ -233,8 +235,8 @@ export default function HomeScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={refresh}
-            tintColor="#2563EB"
-            colors={["#2563EB"]}
+            tintColor={theme.primary}
+            colors={[theme.primary]}
           />
         }
       >

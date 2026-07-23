@@ -437,8 +437,10 @@ import { useCourse } from "@/hooks/useCourse";
 import CourseHeader from "@/components/course/CourseHeader";
 import CourseInfo from "@/components/course/CourseInfo";
 import SectionAccordion from "@/components/course/SectionAccordion";
+import { useAppTheme } from "@/providers/ThemeProvider";
 
 export default function CourseScreen() {
+  const theme = useAppTheme();
   const { id } = useLocalSearchParams();
 
   const {
@@ -496,10 +498,10 @@ export default function CourseScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.center}>
+      <SafeAreaView style={[styles.center, { backgroundColor: theme.background }]}>
         <ActivityIndicator
           size="large"
-          color="#3B82F6" 
+          color={theme.primary}
         />
       </SafeAreaView>
     );
@@ -507,8 +509,8 @@ export default function CourseScreen() {
 
   if (error || !course) {
     return (
-      <SafeAreaView style={styles.center}>
-        <Text style={styles.errorText}>
+      <SafeAreaView style={[styles.center, { backgroundColor: theme.background }]}>
+        <Text style={[styles.errorText, { color: theme.danger, backgroundColor: theme.dangerSoft }]}>
           {error ?? "Course not found"}
         </Text>
       </SafeAreaView>
@@ -516,15 +518,15 @@ export default function CourseScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
       <ScrollView
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
             onRefresh={refresh}
-            tintColor="#3B82F6" // Modern blue for iOS spinner
-            colors={["#3B82F6"]} // Modern blue for Android spinner
+            tintColor={theme.primary}
+            colors={[theme.primary]}
           />
         }
         contentContainerStyle={styles.content}
@@ -546,7 +548,7 @@ export default function CourseScreen() {
           level={course.level}
         />
 
-        <Text style={styles.sectionTitle}>
+        <Text style={[styles.sectionTitle, { color: theme.text }]}>
           Course Content
         </Text>
 

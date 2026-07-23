@@ -9,6 +9,7 @@ import { setTokenGetter } from "@/services/api";
 import { SplashScreenController } from "@/components/splash-screen-controller";
 import {StudentProvider} from "@/providers/StudentProvider"
 import {useStudent} from "@/hooks/useStudent"
+import { ThemeProvider } from "@/providers/ThemeProvider";
 SplashScreen.preventAutoHideAsync();
 
 // function AppNavigator() {
@@ -118,6 +119,8 @@ function AppNavigator() {
     loading,
   } = useStudent();
 
+
+  // console.log("stuedent data:  ", student)
   const isAuthPath =
     pathname.startsWith("/(auth)") ||
     pathname === "/auth";
@@ -206,9 +209,11 @@ export default function RootLayout() {
       publishableKey={process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!}
       tokenCache={tokenCache}
     >
-      <StudentProvider>
-      <AppNavigator />
-      </StudentProvider>
+      <ThemeProvider>
+        <StudentProvider>
+          <AppNavigator />
+        </StudentProvider>
+      </ThemeProvider>
     </ClerkProvider>
   );
 }

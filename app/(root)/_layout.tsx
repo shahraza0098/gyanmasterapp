@@ -46,17 +46,21 @@ import {
 } from "react-native";
 
 import { useStudent } from "@/hooks/useStudent";
+import { useAppTheme } from "@/providers/ThemeProvider";
 
 import {
   hasPlatformAccess,
 } from "@/lib/subscription";
 
 export default function RootLayout() {
+  const theme = useAppTheme();
   const {
     student,
     loading,
   } = useStudent();
 
+
+  console.log("root layout student console: ", student)
   const segments = useSegments();
 
   if (loading) {
@@ -66,7 +70,7 @@ export default function RootLayout() {
           flex: 1,
           justifyContent: "center",
           alignItems: "center",
-          backgroundColor: "#fff",
+          backgroundColor: theme.background,
         }}
       >
         <ActivityIndicator

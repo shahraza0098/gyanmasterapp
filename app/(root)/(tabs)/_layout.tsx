@@ -5,16 +5,18 @@ import { Feather } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import React from "react";
 import { Pressable, PressableProps } from "react-native";
+import { useAppTheme } from "@/providers/ThemeProvider";
 
 export default function TabsLayout() {
+  const theme = useAppTheme();
 
 
   return (
     <Tabs
       screenOptions={{
         tabBarShowLabel: true,
-        tabBarActiveTintColor: "#007AFF",
-        tabBarInactiveTintColor: "#8E8E93",
+        tabBarActiveTintColor: theme.primary,
+        tabBarInactiveTintColor: theme.textMuted,
         tabBarLabelStyle: {
           fontSize: 11,
           fontFamily: "Poppins-Medium",
@@ -22,15 +24,15 @@ export default function TabsLayout() {
         },
         tabBarStyle: {
           height: 60,
-          backgroundColor: "#FFFFFF",
+          backgroundColor: theme.surface,
           borderTopWidth: 1,
-          borderTopColor: "#E0E0E0",
+          borderTopColor: theme.border,
           position: "absolute",
           marginBottom: 20,
           marginHorizontal: 20,
           borderRadius: 16,
           paddingBottom: 6,
-          shadowColor: "#000",
+          shadowColor: theme.isDark ? "#000" : "#0F172A",
           shadowOpacity: 0.08,
           shadowRadius: 6,
           shadowOffset: { width: 0, height: 2 },

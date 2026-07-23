@@ -9,6 +9,7 @@ import {
 import { Feather } from "@expo/vector-icons";
 
 import { Profile } from "@/types/profile";
+import { useAppTheme } from "@/providers/ThemeProvider";
 
 interface Props {
   profile: Profile;
@@ -17,6 +18,7 @@ interface Props {
 export default function ProfileHeader({
   profile,
 }: Props) {
+  const theme = useAppTheme();
   return (
     <View style={styles.container}>
       {profile.imageUrl ? (
@@ -27,24 +29,24 @@ export default function ProfileHeader({
           style={styles.avatar}
         />
       ) : (
-        <View style={styles.avatarPlaceholder}>
+        <View style={[styles.avatarPlaceholder, { backgroundColor: theme.surfaceMuted }]}>
           <Feather
             name="user"
             size={40}
-            color="#64748B"
+            color={theme.textMuted}
           />
         </View>
       )}
 
-      <Text style={styles.name}>
+      <Text style={[styles.name, { color: theme.text }]}>
         {profile.name}
       </Text>
 
-      <Text style={styles.email}>
+      <Text style={[styles.email, { color: theme.textMuted }]}>
         {profile.email}
       </Text>
 
-      <Text style={styles.phone}>
+      <Text style={[styles.phone, { color: theme.textMuted }]}>
         {profile.phone ??
           "Phone not added"}
       </Text>

@@ -6,6 +6,7 @@ import {
 } from "react-native";
 
 import { Feather } from "@expo/vector-icons";
+import { useAppTheme } from "@/providers/ThemeProvider";
 
 interface Props {
   title?: string;
@@ -18,21 +19,22 @@ export default function EmptyMyCourse({
 
   description = "Your courses will appear here once available.",
 }: Props) {
+  const theme = useAppTheme();
   return (
     <View style={styles.container}>
-      <View style={styles.icon}>
+      <View style={[styles.icon, { backgroundColor: theme.surfaceMuted }]}>
         <Feather
           name="book-open"
           size={40}
-          color="#94A3B8"
+          color={theme.textMuted}
         />
       </View>
 
-      <Text style={styles.title}>
+      <Text style={[styles.title, { color: theme.text }]}>
         {title}
       </Text>
 
-      <Text style={styles.description}>
+      <Text style={[styles.description, { color: theme.textMuted }]}>
         {description}
       </Text>
     </View>

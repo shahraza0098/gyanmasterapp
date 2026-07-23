@@ -36,8 +36,10 @@ import EmptyMyCourse from "@/components/mycourse/EmptyMyCourse";
 import { useMyCourse } from "@/hooks/useMyCourses";
 
 import { router } from "expo-router";
+import { useAppTheme } from "@/providers/ThemeProvider";
 
 export default function CoursesScreen() {
+  const theme = useAppTheme();
   const {
     courses,
     loading,
@@ -67,10 +69,10 @@ export default function CoursesScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.center}>
+      <SafeAreaView style={[styles.center, { backgroundColor: theme.background }]}>
         <ActivityIndicator
           size="large"
-          color="#2563EB"
+          color={theme.primary}
         />
       </SafeAreaView>
     );
@@ -78,8 +80,8 @@ export default function CoursesScreen() {
 
   if (error) {
     return (
-      <SafeAreaView style={styles.center}>
-        <Text style={styles.error}>
+      <SafeAreaView style={[styles.center, { backgroundColor: theme.background }]}>
+        <Text style={[styles.error, { color: theme.danger }]}>
           {error}
         </Text>
       </SafeAreaView>
@@ -91,7 +93,7 @@ export default function CoursesScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
       <FlatList
         data={courseList}
         keyExtractor={(item) => item.id}

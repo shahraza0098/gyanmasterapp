@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
+import { useAppTheme } from "@/providers/ThemeProvider";
 
 import { ContinueLearning } from "@/types/home";
 
@@ -13,11 +14,12 @@ export default function ContinueLearningCard({
   data,
   onPress,
 }: Props) {
+  const theme = useAppTheme();
   if (!data) return null;
 
   return (
     <Pressable
-      style={styles.container}
+      style={[styles.container, { backgroundColor: theme.surface }]}
       onPress={onPress}
     >
       <Image
@@ -33,19 +35,19 @@ export default function ContinueLearningCard({
       <View style={styles.content}>
         <Text
           numberOfLines={1}
-          style={styles.courseTitle}
+          style={[styles.courseTitle, { color: theme.text }]}
         >
           {data.course.title}
         </Text>
 
         <Text
           numberOfLines={1}
-          style={styles.lessonTitle}
+          style={[styles.lessonTitle, { color: theme.textMuted }]}
         >
           {data.lessonTitle}
         </Text>
 
-        <View style={styles.progressContainer}>
+        <View style={[styles.progressContainer, { backgroundColor: theme.surfaceMuted }]}>
           <View
             style={[
               styles.progress,
@@ -57,11 +59,11 @@ export default function ContinueLearningCard({
         </View>
 
         <View style={styles.bottomRow}>
-          <Text style={styles.progressText}>
+          <Text style={[styles.progressText, { color: theme.textMuted }]}>
             {data.progress}% completed
           </Text>
 
-          <View style={styles.playButton}>
+          <View style={[styles.playButton, { backgroundColor: theme.primary }]}>
             <Ionicons
               name="play"
               color="#fff"

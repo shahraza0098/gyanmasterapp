@@ -6,6 +6,7 @@ import {
   Text,
   View,
 } from "react-native";
+import { useAppTheme } from "@/providers/ThemeProvider";
 
 interface Props {
   onSearch?: () => void;
@@ -14,26 +15,27 @@ interface Props {
 export default function MyCourseHeader({
   onSearch,
 }: Props) {
+  const theme = useAppTheme();
   return (
     <View style={styles.container}>
       <View>
-        <Text style={styles.title}>
+        <Text style={[styles.title, { color: theme.text }]}>
           My Courses
         </Text>
 
-        <Text style={styles.subtitle}>
+        <Text style={[styles.subtitle, { color: theme.textMuted }]}>
           Continue your learning journey
         </Text>
       </View>
 
       <Pressable
         onPress={onSearch}
-        style={styles.searchButton}
+        style={[styles.searchButton, { backgroundColor: theme.surface, borderColor: theme.border }]}
       >
         <Feather
           name="search"
           size={22}
-          color="#1E293B"
+          color={theme.text}
         />
       </Pressable>
     </View>

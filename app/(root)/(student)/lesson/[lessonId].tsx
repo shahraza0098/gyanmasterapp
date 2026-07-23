@@ -22,8 +22,10 @@ import VideoPlayer from "@/components/lesson/VideoPlayer";
 import LessonProgress from "@/components/lesson/LessonProgress";
 import LessonDescription from "@/components/lesson/LessonDescription";
 import LessonNavigation from "@/components/lesson/LessonNavigation";
+import { useAppTheme } from "@/providers/ThemeProvider";
 
 export default function LessonScreen() {
+  const theme = useAppTheme();
   const { lessonId } = useLocalSearchParams<{ lessonId: string }>();
 
   const { lesson, loading, refreshing, error, refresh } = useLesson(lessonId);
@@ -44,9 +46,9 @@ export default function LessonScreen() {
    */
   if (loading) {
     return (
-      <SafeAreaView style={styles.centerState}>
-        <ActivityIndicator size="large" color="#3B82F6" />
-        <Text style={styles.stateText}>Loading your lesson...</Text>
+      <SafeAreaView style={[styles.centerState, { backgroundColor: theme.background }]}>
+        <ActivityIndicator size="large" color={theme.primary} />
+        <Text style={[styles.stateText, { color: theme.textMuted }]}>Loading your lesson...</Text>
       </SafeAreaView>
     );
   }
@@ -56,13 +58,13 @@ export default function LessonScreen() {
    */
   if (!lesson) {
     return (
-      <SafeAreaView style={styles.centerState}>
+      <SafeAreaView style={[styles.centerState, { backgroundColor: theme.background }]}>
         <View style={styles.errorContainer}>
           <Text style={styles.errorIcon}>⚠️</Text>
-          <Text style={styles.errorTitle}>
+          <Text style={[styles.errorTitle, { color: theme.text }]}>
             {error ?? "Unable to load lesson"}
           </Text>
-          <Text style={styles.errorSubtext}>
+          <Text style={[styles.errorSubtext, { color: theme.textMuted }]}>
             Please pull down to refresh and try again.
           </Text>
         </View>
@@ -71,7 +73,7 @@ export default function LessonScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -79,8 +81,8 @@ export default function LessonScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={refresh}
-            tintColor="#3B82F6"
-            colors={["#3B82F6"]}
+            tintColor={theme.primary}
+            colors={[theme.primary]}
           />
         }
       >
@@ -94,14 +96,14 @@ export default function LessonScreen() {
         </View>
 
         {/* Media & Progress Card */}
-        <View style={styles.mediaCard}>
+        <View style={[styles.mediaCard, { backgroundColor: theme.surface, shadowColor: theme.text }]}>
           <VideoPlayer
             streamUrl={lesson.streamUrl}
             watchedSeconds={player.watchedSeconds}
             onTimeUpdate={player.onTimeUpdate}
             onEnded={player.onEnded}
           />
-          <View style={styles.progressWrapper}>
+          <View style={[styles.progressWrapper, { borderTopColor: theme.border }]}>
             <LessonProgress
               watchedSeconds={player.watchedSeconds}
               duration={lesson.duration}

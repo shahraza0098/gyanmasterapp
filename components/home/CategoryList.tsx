@@ -2,6 +2,7 @@ import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import { Image } from "expo-image";
 
 import { Category } from "@/types/home";
+import { useAppTheme } from "@/providers/ThemeProvider";
 
 interface Props {
   categories: Category[];
@@ -12,9 +13,10 @@ export default function CategoryList({
   categories,
   onPress,
 }: Props) {
+  const theme = useAppTheme();
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>Categories</Text>
+      <Text style={[styles.heading, { color: theme.text }]}>Categories</Text>
 
       <FlatList
         horizontal

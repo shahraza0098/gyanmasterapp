@@ -27,10 +27,13 @@ import { useClerk } from "@clerk/expo";
 
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import LogoutButton from "@/components/profile/LogoutButton";
+import ProfileSettings from "@/components/profile/ProfileSettings";
 
 import { useProfile } from "@/hooks/useProfile";
+import { useAppTheme } from "@/providers/ThemeProvider";
 
 export default function ProfileScreen() {
+  const theme = useAppTheme();
   const {
     profile,
     loading,
@@ -43,10 +46,10 @@ export default function ProfileScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.center}>
+      <SafeAreaView style={[styles.center, { backgroundColor: theme.background }]}>
         <ActivityIndicator
           size="large"
-          color="#2563EB"
+          color={theme.primary}
         />
       </SafeAreaView>
     );
@@ -54,14 +57,14 @@ export default function ProfileScreen() {
 
   if (!profile) {
     return (
-      <SafeAreaView style={styles.center}>
-        <Text>{error}</Text>
+      <SafeAreaView style={[styles.center, { backgroundColor: theme.background }]}>
+        <Text style={{ color: theme.danger }}>{error}</Text>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
       <ScrollView
         refreshControl={
           <RefreshControl
@@ -76,6 +79,8 @@ export default function ProfileScreen() {
         <ProfileHeader
           profile={profile}
         />
+
+        <ProfileSettings profile={profile} />
 
         <LogoutButton
           onPress={() => signOut()}

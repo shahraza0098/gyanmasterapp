@@ -5,6 +5,7 @@ import {
   Text,
   View,
 } from "react-native";
+import { useAppTheme } from "@/providers/ThemeProvider";
 
 export type CourseTab =
   | "all"
@@ -32,6 +33,7 @@ export default function MyCourseTabs({
   stats,
   onChange,
 }: Props) {
+  const theme = useAppTheme();
   const tabs = [
     {
       key: "all",
@@ -66,16 +68,15 @@ export default function MyCourseTabs({
             style={[
               styles.tab,
 
-              active &&
-                styles.activeTab,
+              active && styles.activeTab,
+              active && { borderBottomColor: theme.primary },
             ]}
           >
             <Text
               style={[
                 styles.label,
 
-                active &&
-                  styles.activeLabel,
+                { color: active ? theme.primary : theme.textMuted },
               ]}
             >
               {tab.label}
