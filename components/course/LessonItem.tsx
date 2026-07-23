@@ -196,6 +196,7 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
+import { useAppTheme } from "@/providers/ThemeProvider";
 
 import { Lesson } from "@/types/course";
 
@@ -221,6 +222,7 @@ export default function LessonItem({
   lesson,
   onPress,
 }: Props) {
+  const theme = useAppTheme();
   const progress =
     lesson.progress && lesson.duration > 0
       ? Math.min(
@@ -235,7 +237,7 @@ export default function LessonItem({
 
   return (
     <Pressable
-      style={styles.container}
+      style={[styles.container, { backgroundColor: theme.surfaceMuted }]}
       onPress={onPress}
     >
       <Image
@@ -249,7 +251,7 @@ export default function LessonItem({
       <View style={styles.content}>
         <Text
           numberOfLines={2}
-          style={styles.title}
+          style={[styles.title, { color: theme.text }]}
         >
           {lesson.title}
         </Text>
@@ -258,10 +260,10 @@ export default function LessonItem({
           <Ionicons
             name="time-outline"
             size={14}
-            color="#64748B"
+            color={theme.textMuted}
           />
 
-          <Text style={styles.infoText}>
+          <Text style={[styles.infoText, { color: theme.textMuted }]}>
             {formatDuration(lesson.duration)}
           </Text>
 
@@ -289,7 +291,7 @@ export default function LessonItem({
           )}
         </View>
 
-        <View style={styles.progressBackground}>
+        <View style={[styles.progressBackground, { backgroundColor: theme.border }]}>
           <View
             style={[
               styles.progressFill,
@@ -312,13 +314,13 @@ export default function LessonItem({
           <Ionicons
             name="play-circle"
             size={28}
-            color="#3B82F6" // Modern blue
+            color={theme.primary}
           />
         ) : (
           <Ionicons
             name="play-circle-outline"
             size={28}
-            color="#CBD5E1" // Softer unplayed state
+            color={theme.textMuted}
           />
         )}
       </View>

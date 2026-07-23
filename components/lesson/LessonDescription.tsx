@@ -108,6 +108,7 @@
 import React, { useMemo, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Feather } from "@expo/vector-icons";
+import { useAppTheme } from "@/providers/ThemeProvider";
 
 interface LessonDescriptionProps {
   description: string | null;
@@ -116,6 +117,7 @@ interface LessonDescriptionProps {
 const PREVIEW_LENGTH = 220;
 
 export default function LessonDescription({ description }: LessonDescriptionProps) {
+  const theme = useAppTheme();
   const [expanded, setExpanded] = useState(false);
 
   const hasDescription = !!description?.trim();
@@ -129,13 +131,13 @@ export default function LessonDescription({ description }: LessonDescriptionProp
   }, [description, expanded, hasDescription, shouldCollapse]);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.surface, borderColor: theme.border }]}>
       <View style={styles.accentBar} />
 
       <View style={styles.body}>
-        <Text style={styles.heading}>About this lesson</Text>
+        <Text style={[styles.heading, { color: theme.textMuted }]}>About this lesson</Text>
 
-        <Text style={styles.description}>{content}</Text>
+        <Text style={[styles.description, { color: theme.text }]}>{content}</Text>
 
         {shouldCollapse && (
           <Pressable
@@ -146,13 +148,13 @@ export default function LessonDescription({ description }: LessonDescriptionProp
               pressed && styles.buttonPressed,
             ]}
           >
-            <Text style={styles.buttonText}>
+            <Text style={[styles.buttonText, { color: theme.primary }]}>
               {expanded ? "Read less" : "Read more"}
             </Text>
             <Feather
               name={expanded ? "chevron-up" : "chevron-down"}
               size={14}
-              color="#F97316"
+              color={theme.primary}
             />
           </Pressable>
         )}

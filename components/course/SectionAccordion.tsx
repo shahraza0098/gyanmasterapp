@@ -144,6 +144,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 import { Section } from "@/types/course";
 import LessonItem from "./LessonItem";
+import { useAppTheme } from "@/providers/ThemeProvider";
 
 if (
   Platform.OS === "android" &&
@@ -163,6 +164,7 @@ export default function SectionAccordion({
   initiallyExpanded = false,
   onLessonPress,
 }: Props) {
+  const theme = useAppTheme();
   const [expanded, setExpanded] =
     useState(initiallyExpanded);
 
@@ -180,22 +182,22 @@ export default function SectionAccordion({
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.surface, shadowColor: theme.text }]}>
       <Pressable
         style={styles.header}
         onPress={toggle}
       >
         <View style={styles.headerTextContainer}>
-          <Text style={styles.title}>
+          <Text style={[styles.title, { color: theme.text }]}>
             {section.title}
           </Text>
 
-          <Text style={styles.subtitle}>
+          <Text style={[styles.subtitle, { color: theme.textMuted }]}>
             {completedLessons} / {section.lessons.length} Lessons Completed
           </Text>
         </View>
 
-        <View style={styles.iconWrapper}>
+        <View style={[styles.iconWrapper, { backgroundColor: theme.primarySoft }]}>
           <Ionicons
             name={
               expanded
@@ -203,7 +205,7 @@ export default function SectionAccordion({
                 : "chevron-down"
             }
             size={20}
-            color="#3B82F6"
+            color={theme.primary}
           />
         </View>
       </Pressable>

@@ -209,6 +209,7 @@
 
 import { StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useAppTheme } from "@/providers/ThemeProvider";
 
 interface Props {
   description: string;
@@ -240,74 +241,75 @@ export default function CourseInfo({
   completedLessons,
   level,
 }: Props) {
+  const theme = useAppTheme();
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.surface, shadowColor: theme.text }]}>
       <View style={styles.statsRow}>
         <View style={styles.statCard}>
-          <View style={styles.iconWrapper}>
+          <View style={[styles.iconWrapper, { backgroundColor: theme.primarySoft }]}>
             <Ionicons
               name="play-circle-outline"
               size={24}
-              color="#3B82F6" // Modern, brighter blue
+              color={theme.primary}
             />
           </View>
-          <Text style={styles.value}>{lessonCount}</Text>
-          <Text style={styles.label}>Lessons</Text>
+          <Text style={[styles.value, { color: theme.text }]}>{lessonCount}</Text>
+          <Text style={[styles.label, { color: theme.textMuted }]}>Lessons</Text>
         </View>
 
         <View style={styles.statCard}>
-          <View style={styles.iconWrapper}>
+          <View style={[styles.iconWrapper, { backgroundColor: theme.primarySoft }]}>
             <Ionicons
               name="albums-outline"
               size={24}
-              color="#3B82F6"
+              color={theme.primary}
             />
           </View>
-          <Text style={styles.value}>{sectionCount}</Text>
-          <Text style={styles.label}>Sections</Text>
+          <Text style={[styles.value, { color: theme.text }]}>{sectionCount}</Text>
+          <Text style={[styles.label, { color: theme.textMuted }]}>Sections</Text>
         </View>
 
         <View style={styles.statCard}>
-          <View style={styles.iconWrapper}>
+          <View style={[styles.iconWrapper, { backgroundColor: theme.primarySoft }]}>
             <Ionicons
               name="time-outline"
               size={24}
-              color="#3B82F6"
+              color={theme.primary}
             />
           </View>
-          <Text style={styles.value}>
+          <Text style={[styles.value, { color: theme.text }]}>
             {formatDuration(totalDuration)}
           </Text>
-          <Text style={styles.label}>Duration</Text>
+          <Text style={[styles.label, { color: theme.textMuted }]}>Duration</Text>
         </View>
       </View>
 
       <View style={styles.levelContainer}>
-        <Text style={styles.levelBadge}>
+        <Text style={[styles.levelBadge, { backgroundColor: theme.surfaceMuted, color: theme.textMuted }]}>
           {level}
         </Text>
       </View>
 
-      <Text style={styles.heading}>
+      <Text style={[styles.heading, { color: theme.text }]}>
         Description
       </Text>
 
-      <Text style={styles.description}>
+      <Text style={[styles.description, { color: theme.textMuted }]}>
         {description}
       </Text>
 
       <View style={styles.progressContainer}>
         <View style={styles.progressHeader}>
-          <Text style={styles.headingStyle}>
+          <Text style={[styles.headingStyle, { color: theme.text }]}>
             Your Progress
           </Text>
 
-          <Text style={styles.percent}>
+          <Text style={[styles.percent, { color: theme.primary }]}>
             {progress}%
           </Text>
         </View>
 
-        <View style={styles.progressBackground}>
+        <View style={[styles.progressBackground, { backgroundColor: theme.surfaceMuted }]}>
           <View
             style={[
               styles.progressFill,
@@ -318,7 +320,7 @@ export default function CourseInfo({
           />
         </View>
 
-        <Text style={styles.completed}>
+        <Text style={[styles.completed, { color: theme.textMuted }]}>
           {completedLessons} lessons completed
         </Text>
       </View>

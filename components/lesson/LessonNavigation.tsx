@@ -198,6 +198,7 @@ import { Feather } from "@expo/vector-icons";
 import { router } from "expo-router";
 
 import type { LessonNavigationItem } from "@/types/lesson";
+import { useAppTheme } from "@/providers/ThemeProvider";
 
 interface Props {
   previousLesson: LessonNavigationItem | null;
@@ -211,6 +212,7 @@ function LessonCard({
   lesson: LessonNavigationItem | null;
   direction: "previous" | "next";
 }) {
+  const theme = useAppTheme();
   const disabled = !lesson;
   const isNext = direction === "next";
 
@@ -234,25 +236,26 @@ function LessonCard({
       onPress={navigate}
       style={({ pressed }) => [
         styles.card,
+        { backgroundColor: theme.surface, borderColor: theme.border },
         !disabled && { borderLeftColor: accent },
-        disabled && styles.disabledCard,
+        disabled && [styles.disabledCard, { backgroundColor: theme.surfaceMuted, borderLeftColor: theme.border }],
         pressed && !disabled && styles.cardPressed,
       ]}
     >
       {!isNext && (
-        <View style={[styles.iconCircle, { backgroundColor: disabled ? "#F1EEE7" : accentBg }]}>
-          <Feather name={icon} size={17} color={disabled ? "#C9C2B4" : accent} />
+        <View style={[styles.iconCircle, { backgroundColor: disabled ? theme.surfaceMuted : accentBg }]}>
+          <Feather name={icon} size={17} color={disabled ? theme.textMuted : accent} />
         </View>
       )}
 
       <View style={styles.content}>
-        <Text style={[styles.label, isNext && styles.textRight]}>{title}</Text>
+        <Text style={[styles.label, { color: theme.textMuted }, isNext && styles.textRight]}>{title}</Text>
 
         <Text
           numberOfLines={2}
           style={[
             styles.lessonTitle,
-            disabled && styles.disabledText,
+            { color: disabled ? theme.textMuted : theme.text },
             isNext && styles.textRight,
           ]}
         >
@@ -266,7 +269,7 @@ function LessonCard({
         {lesson && (
           <Text
             numberOfLines={1}
-            style={[styles.section, isNext && styles.textRight]}
+            style={[styles.section, { color: theme.textMuted }, isNext && styles.textRight]}
           >
             {lesson.sectionTitle}
           </Text>
@@ -274,8 +277,8 @@ function LessonCard({
       </View>
 
       {isNext && (
-        <View style={[styles.iconCircle, { backgroundColor: disabled ? "#F1EEE7" : accentBg }]}>
-          <Feather name={icon} size={17} color={disabled ? "#C9C2B4" : accent} />
+        <View style={[styles.iconCircle, { backgroundColor: disabled ? theme.surfaceMuted : accentBg }]}>
+          <Feather name={icon} size={17} color={disabled ? theme.textMuted : accent} />
         </View>
       )}
     </Pressable>

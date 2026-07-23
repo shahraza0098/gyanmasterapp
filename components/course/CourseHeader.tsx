@@ -104,6 +104,7 @@
 import { StyleSheet, Text, View } from "react-native";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
+import { useAppTheme } from "@/providers/ThemeProvider";
 
 interface Props {
   title: string;
@@ -118,8 +119,9 @@ export default function CourseHeader({
   category,
   level,
 }: Props) {
+  const theme = useAppTheme();
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.surfaceMuted }]}>
       <Image
         source={{ uri: thumbnailUrl }}
         style={styles.image}

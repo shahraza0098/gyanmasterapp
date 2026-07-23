@@ -71,6 +71,7 @@
 
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
+import { useAppTheme } from "@/providers/ThemeProvider";
 
 interface LessonHeaderProps {
   courseTitle: string;
@@ -83,21 +84,22 @@ export default function LessonHeader({
   sectionTitle,
   lessonTitle,
 }: LessonHeaderProps) {
+  const theme = useAppTheme();
   return (
     <View style={styles.container}>
       <View style={styles.eyebrowRow}>
-        <View style={styles.coursePill}>
-          <Text numberOfLines={1} style={styles.course}>
+        <View style={[styles.coursePill, { backgroundColor: theme.primarySoft }]}>
+          <Text numberOfLines={1} style={[styles.course, { color: theme.primary }]}>
             {courseTitle}
           </Text>
         </View>
-        <View style={styles.dot} />
-        <Text numberOfLines={1} style={styles.section}>
+        <View style={[styles.dot, { backgroundColor: theme.border }]} />
+        <Text numberOfLines={1} style={[styles.section, { color: theme.textMuted }]}>
           {sectionTitle}
         </Text>
       </View>
 
-      <Text style={styles.lesson}>{lessonTitle}</Text>
+      <Text style={[styles.lesson, { color: theme.text }]}>{lessonTitle}</Text>
     </View>
   );
 }

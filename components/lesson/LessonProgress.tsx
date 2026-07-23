@@ -149,6 +149,7 @@
 
 import React, { useMemo } from "react";
 import { StyleSheet, Text, View } from "react-native";
+import { useAppTheme } from "@/providers/ThemeProvider";
 
 interface LessonProgressProps {
   watchedSeconds: number;
@@ -161,6 +162,7 @@ export default function LessonProgress({
   duration,
   completed,
 }: LessonProgressProps) {
+  const theme = useAppTheme();
   const progress = useMemo(() => {
     if (duration <= 0) return 0;
     return Math.min(watchedSeconds / duration, 1);
@@ -188,15 +190,15 @@ export default function LessonProgress({
       <View style={styles.row}>
         <View style={styles.leftCol}>
           <View style={styles.headerRow}>
-            <Text style={styles.title}>Progress</Text>
+            <Text style={[styles.title, { color: theme.textMuted }]}>Progress</Text>
             {completed && (
-              <View style={styles.badge}>
-                <Text style={styles.badgeText}>Completed</Text>
+              <View style={[styles.badge, { backgroundColor: theme.primarySoft }]}>
+                <Text style={[styles.badgeText, { color: theme.primary }]}>Completed</Text>
               </View>
             )}
           </View>
 
-          <View style={styles.progressBar}>
+          <View style={[styles.progressBar, { backgroundColor: theme.surfaceMuted }]}>
             <View
               style={[
                 styles.progressFill,
@@ -205,7 +207,7 @@ export default function LessonProgress({
             />
           </View>
 
-          <Text style={styles.time}>
+          <Text style={[styles.time, { color: theme.textMuted }]}>
             {formatTime(watchedSeconds)} / {formatTime(duration)}
           </Text>
         </View>
