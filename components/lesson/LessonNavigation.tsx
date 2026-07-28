@@ -317,7 +317,6 @@ const styles = StyleSheet.create({
   },
   cardPressed: {
     opacity: 0.7,
-    backgroundColor: "#FCFAF6",
   },
   disabledCard: {
     opacity: 0.5,

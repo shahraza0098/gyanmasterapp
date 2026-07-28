@@ -21,17 +21,17 @@ export default function OnboardingScreen() {
   const theme = useAppTheme();
   const { getToken } = useAuth();
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  // const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [username, setUsername] = useState("");
+  // const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(false);
 
   console.log("API_URL:", API_URL);
   console.log("name:", name);
 
   const handleContinue = async () => {
-    if (!name.trim() || !email.trim()) {
-      Alert.alert("Missing info", "Please enter your name and email to continue.");
+    if (!name.trim() || !phone.trim()) {
+      Alert.alert("Missing info", "Please enter your name and phone to continue.");
       return;
     }
 
@@ -54,9 +54,9 @@ export default function OnboardingScreen() {
         },
         body: JSON.stringify({
           name: name.trim(),
-          email: email.trim(),
+          // email: email.trim(),
           phone: phone.trim(),
-          username: username.trim(),
+          // username: username.trim(),
         }),
       });
 
@@ -105,7 +105,7 @@ export default function OnboardingScreen() {
               <View style={styles.inputGroup}>
                 <Text style={[styles.label, { color: theme.textMuted }]}>Full Name</Text>
                 <TextInput
-                  placeholder="John Doe"
+                  placeholder="Eon Morgon"
                   placeholderTextColor={theme.textMuted}
                   value={name}
                   onChangeText={setName}
@@ -113,7 +113,7 @@ export default function OnboardingScreen() {
                 />
               </View>
 
-              <View style={styles.inputGroup}>
+              {/* <View style={styles.inputGroup}>
                 <Text style={[styles.label, { color: theme.textMuted }]}>Email Address</Text>
                 <TextInput
                   placeholder="john@example.com"
@@ -124,12 +124,12 @@ export default function OnboardingScreen() {
                   onChangeText={setEmail}
                   style={[styles.input, { backgroundColor: theme.surfaceMuted, borderColor: theme.border, color: theme.text }]}
                 />
-              </View>
+              </View> */}
 
               <View style={styles.inputGroup}>
                 <Text style={[styles.label, { color: theme.textMuted }]}>Phone <Text style={[styles.optional, { color: theme.textMuted }]}>(Optional)</Text></Text>
                 <TextInput
-                  placeholder="+1 234 567 8900"
+                  placeholder="+91 1231-481-102"
                   placeholderTextColor={theme.textMuted}
                   value={phone}
                   keyboardType="phone-pad"
@@ -138,7 +138,7 @@ export default function OnboardingScreen() {
                 />
               </View>
 
-              <View style={styles.inputGroup}>
+              {/* <View style={styles.inputGroup}>
                 <Text style={[styles.label, { color: theme.textMuted }]}>Username <Text style={[styles.optional, { color: theme.textMuted }]}>(Optional)</Text></Text>
                 <TextInput
                   placeholder="@johndoe"
@@ -148,7 +148,7 @@ export default function OnboardingScreen() {
                   onChangeText={setUsername}
                   style={[styles.input, { backgroundColor: theme.surfaceMuted, borderColor: theme.border, color: theme.text }]}
                 />
-              </View>
+              </View> */}
             </View>
           </View>
 

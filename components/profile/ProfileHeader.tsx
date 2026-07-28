@@ -42,14 +42,14 @@ export default function ProfileHeader({
         {profile.name}
       </Text>
 
-      <Text style={[styles.email, { color: theme.textMuted }]}>
+      {/* <Text style={[styles.email, { color: theme.textMuted }]}>
         {profile.email}
       </Text>
 
       <Text style={[styles.phone, { color: theme.textMuted }]}>
         {profile.phone ??
           "Phone not added"}
-      </Text>
+      </Text> */}
     </View>
   );
 }

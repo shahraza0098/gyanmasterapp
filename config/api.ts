@@ -1,7 +1,7 @@
 type AppEnv = "development" | "staging" | "production";
 
 const API_URL_BY_ENV: Record<AppEnv, string> = {
-  development: "http://172.19.218.5:3000",
+  development: "http://192.168.1.18:3000",
   staging: "https://staging.gyanmaster.com",
   production: "https://www.gyanmaster.com",
 };

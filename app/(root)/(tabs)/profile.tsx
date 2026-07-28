@@ -28,12 +28,15 @@ import { useClerk } from "@clerk/expo";
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import LogoutButton from "@/components/profile/LogoutButton";
 import ProfileSettings from "@/components/profile/ProfileSettings";
+import SubscriptionDetails from "@/components/profile/SubscriptionDetails";
 
 import { useProfile } from "@/hooks/useProfile";
 import { useAppTheme } from "@/providers/ThemeProvider";
+import { useStudentContext } from "@/providers/StudentProvider";
 
 export default function ProfileScreen() {
   const theme = useAppTheme();
+  const { student } = useStudentContext();
   const {
     profile,
     loading,
@@ -82,6 +85,8 @@ export default function ProfileScreen() {
 
         <ProfileSettings profile={profile} />
 
+        <SubscriptionDetails subscription={student?.subscription} />
+
         <LogoutButton
           onPress={() => signOut()}
         />
@@ -102,8 +107,7 @@ const styles = StyleSheet.create({
 
     flexGrow: 1,
 
-    justifyContent:
-      "space-between",
+    gap: 16,
   },
 
   center: {
