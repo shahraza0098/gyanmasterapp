@@ -15,10 +15,10 @@ import React from "react";
 import {
   ActivityIndicator,
   RefreshControl,
-  
   ScrollView,
   StyleSheet,
   Text,
+  View,
 } from "react-native";
 
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -75,21 +75,18 @@ export default function ProfileScreen() {
             onRefresh={refresh}
           />
         }
-        contentContainerStyle={
-          styles.content
-        }
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
       >
-        <ProfileHeader
-          profile={profile}
-        />
-        <Text>Welcome to GyanMaster OTA 🚀</Text>
-        <ProfileSettings profile={profile} />
+        <ProfileHeader profile={profile} />
 
-        <SubscriptionDetails subscription={student?.subscription} />
+        <View style={styles.menuContainer}>
+          <ProfileSettings profile={profile} />
 
-        <LogoutButton
-          onPress={() => signOut()}
-        />
+          <SubscriptionDetails subscription={student?.subscription} />
+
+          <LogoutButton onPress={() => signOut()} />
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -98,23 +95,20 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-
     backgroundColor: "#F8FAFC",
   },
-
   content: {
-    padding: 20,
-
+    paddingHorizontal: 20,
+    paddingVertical: 16,
     flexGrow: 1,
-
-    gap: 16,
   },
-
+  menuContainer: {
+    marginTop: 14,
+    gap: 12,
+  },
   center: {
     flex: 1,
-
     justifyContent: "center",
-
     alignItems: "center",
   },
 });
