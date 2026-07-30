@@ -82,7 +82,7 @@ export default function ProfileScreen() {
         <ProfileHeader
           profile={profile}
         />
-
+        <Text>Welcome to GyanMaster OTA 🚀</Text>
         <ProfileSettings profile={profile} />
 
         <SubscriptionDetails subscription={student?.subscription} />
