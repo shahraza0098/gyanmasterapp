@@ -2,7 +2,7 @@
   "expo": {
     "name": "GyanMaster",
     "slug": "GyanMaster",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "gyanmaster",
@@ -55,6 +55,12 @@
         "projectId": "c72bcaaf-025a-4da6-b9f5-696c9f075879"
       }
     },
-    "owner": "shahraza0098"
+    "owner": "shahraza0098",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/c72bcaaf-025a-4da6-b9f5-696c9f075879"
+    }
   }
 }

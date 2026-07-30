@@ -180,6 +180,7 @@ import SearchBar from "@/components/home/SearchBar";
 import ContinueLearningCard from "@/components/home/ContinueLearningCard";
 import CategoryList from "@/components/home/CategoryList";
 import CourseHorizontalList from "@/components/home/CourseHorizontalList";
+import AllCoursesCatalog from "@/components/home/AllCoursesCatalog";
 import { useAppTheme } from "@/providers/ThemeProvider";
 
 export default function HomeScreen() {
@@ -189,6 +190,7 @@ export default function HomeScreen() {
     continueLearning,
     categories,
     featuredCourses,
+    allCourses,
     popularCourses,
     trendingCourses,
     loading,
@@ -264,16 +266,9 @@ export default function HomeScreen() {
           }}
         />
 
-        <CategoryList
-          categories={categories}
-          onPress={(category) =>
-            router.push({
-              pathname: "/courses",
-              params: {
-                categoryId: category.id,
-              },
-            })
-          }
+        <AllCoursesCatalog
+          courses={allCourses}
+          onPress={(course) => router.push(`/course/${course.id}`)}
         />
 
         <CourseHorizontalList
@@ -292,6 +287,16 @@ export default function HomeScreen() {
           title="Trending Courses"
           courses={trendingCourses}
           onPress={(course) => router.push(`/course/${course.id}`)}
+        />
+
+        <CategoryList
+          categories={categories}
+          onPress={(category) =>
+            router.push({
+              pathname: "/courses",
+              params: { categoryId: category.id },
+            })
+          }
         />
       </ScrollView>
     </SafeAreaView>

@@ -114,18 +114,7 @@ export default function GreetingHeader({
         </Text>
       </View>
 
-      <View style={[styles.avatarRing, { backgroundColor: theme.surface, shadowColor: theme.text }]}>
-        <Image
-          source={
-            image
-              ? { uri: image }
-              : require("@/assets/images/icon.png")
-          }
-          style={styles.avatar}
-          contentFit="cover"
-          transition={250} // Added a slight crossfade transition for a premium feel
-        />
-      </View>
+     
     </View>
   );
 }

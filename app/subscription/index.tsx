@@ -1082,7 +1082,7 @@ const COLORS = {
 
 const PLAN = {
   trialAmount: 1,
-  trialDays: 3,
+  trialDays: 1,
   monthlyAmount: 499,
 };
 
@@ -1144,6 +1144,11 @@ export default function SubscriptionScreen() {
         name: "Premium",
         description: `₹${trialAmount} today, then ₹${monthlyAmount}/mo`,
         theme: { color: COLORS.accent },
+          prefill: {
+    email: student?.email,
+    contact: student?.phone,
+    name: student?.name,
+  },
       });
 
       console.log("result coming: ", result);

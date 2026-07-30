@@ -68,6 +68,8 @@ export interface HomeResponse {
 
   featuredCourses: CourseCard[];
 
+  allCourses: CourseCard[];
+
   popularCourses: CourseCard[];
 
   trendingCourses: CourseCard[];

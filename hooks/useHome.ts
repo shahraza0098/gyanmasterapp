@@ -54,6 +54,8 @@ export function useHome() {
 
     featuredCourses: home?.featuredCourses ?? [],
 
+    allCourses: home?.allCourses ?? [],
+
     popularCourses: home?.popularCourses ?? [],
 
     trendingCourses: home?.trendingCourses ?? [],
