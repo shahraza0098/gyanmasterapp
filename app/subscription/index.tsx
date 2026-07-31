@@ -1059,6 +1059,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import RazorpayCheckout from "react-native-razorpay";
 import { router } from "expo-router";
+import { useClerk } from "@clerk/expo";
 
 import { useStudentContext } from "@/providers/StudentProvider";
 import { useSubscription } from "@/hooks/useSubscription";
@@ -1101,6 +1102,7 @@ export default function SubscriptionScreen() {
   const [message, setMessage] = useState<string | null>(null);
 
   const { student, loading, refreshStudent, setStudent } = useStudentContext();
+  const { signOut } = useClerk();
   const busy =
     status === "starting" || status === "checkout" || status === "verifying";
 
@@ -1200,13 +1202,23 @@ export default function SubscriptionScreen() {
           contentContainerClassName="p-6 pb-10"
           showsVerticalScrollIndicator={false}
         >
-          <Pressable
-            onPress={() => router.back()}
-            hitSlop={12}
-            className="w-9 h-9 rounded-full bg-transparent items-center justify-center mb-4 -ml-2"
-          >
-            <Feather name="x" size={20} color={COLORS.text} />
-          </Pressable>
+          <View className="flex-row items-center justify-between mb-4">
+            <Pressable
+              onPress={() => router.back()}
+              hitSlop={12}
+              className="w-9 h-9 rounded-full bg-transparent items-center justify-center -ml-2"
+            >
+              <Feather name="x" size={20} color={COLORS.text} />
+            </Pressable>
+            <Pressable
+              onPress={() => signOut()}
+              className="w-10 h-10 rounded-full bg-[#E5636B] items-center justify-center"
+              accessibilityRole="button"
+              accessibilityLabel="Sign out"
+            >
+              <Feather name="log-out" size={18} color="#ffffffff" />
+            </Pressable>
+          </View>
 
           <Text className="text-[#FFC72C] text-xs font-extrabold tracking-[1.5px] mb-3">
             PREMIUM
