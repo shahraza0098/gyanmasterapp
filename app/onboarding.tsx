@@ -9,10 +9,12 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
-  ScrollView
+  ScrollView,
+  Pressable
 } from "react-native";
 import { router } from "expo-router";
-import { useAuth } from "@clerk/expo";
+import { useAuth, useClerk } from "@clerk/expo";
+import { Feather } from "@expo/vector-icons";
 import { API_URL } from "../config/api";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAppTheme } from "@/providers/ThemeProvider";
@@ -21,6 +23,7 @@ import { getErrorMessage } from "@/utils/errorMessages";
 export default function OnboardingScreen() {
   const theme = useAppTheme();
   const { getToken } = useAuth();
+  const { signOut } = useClerk();
   const [name, setName] = useState("");
 
   const [phone, setPhone] = useState("");
@@ -107,7 +110,17 @@ export default function OnboardingScreen() {
         >
           <View>
             <View style={styles.headerContainer}>
-              <Text style={[styles.title, { color: theme.text }]}>Welcome to GyanMaster</Text>
+              <View style={styles.headerRow}>
+                <Text style={[styles.title, { color: theme.text, flex: 1 }]}>Welcome to GyanMaster</Text>
+                <Pressable
+                  onPress={() => signOut()}
+                  style={[styles.logoutButton, { backgroundColor: theme.accentCrimson }]}
+                  accessibilityRole="button"
+                  accessibilityLabel="Sign out"
+                >
+                  <Feather name="log-out" size={18} color="#ffffffff" />
+                </Pressable>
+              </View>
               <Text style={[styles.subtitle, { color: theme.textMuted }]}>
                 Tell us a little about yourself so we can personalize your learning journey.
               </Text>
@@ -205,6 +218,19 @@ const styles = StyleSheet.create({
   headerContainer: {
     marginBottom: 32,
     marginTop: 10,
+  },
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  logoutButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    marginLeft: 12,
   },
   title: {
     fontSize: 34,
