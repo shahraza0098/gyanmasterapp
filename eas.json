@@ -30,12 +30,7 @@
         "CLERK_SIGN_UP_FORCE_REDIRECT_URL": "/onboarding",
         "CLERK_SIGN_IN_FALLBACK_REDIRECT_URL": "/index"
       }
-    },
-    // "apk":{
-    //    "android": {
-    //     "buildType": "apk"
-    //   }
-    // }
+    }
   },
   "submit": {
     "production": {}
