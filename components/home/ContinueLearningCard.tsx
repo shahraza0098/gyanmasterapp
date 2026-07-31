@@ -19,7 +19,14 @@ export default function ContinueLearningCard({
 
   return (
     <Pressable
-      style={[styles.container, { backgroundColor: theme.surface }]}
+      style={[
+        styles.container,
+        {
+          backgroundColor: theme.surface,
+          borderColor: theme.border,
+          shadowColor: theme.isDark ? "#000000" : "#0F172A",
+        },
+      ]}
       onPress={onPress}
     >
       <Image
@@ -79,14 +86,13 @@ export default function ContinueLearningCard({
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    backgroundColor: "#fff",
-
     borderRadius: 18,
-
+    borderWidth: 1,
     overflow: "hidden",
-
-    elevation: 2,
-
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 4,
     marginBottom: 24,
   },
 

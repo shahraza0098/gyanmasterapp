@@ -182,7 +182,7 @@
 //               contentFit="cover" 
 //               transition={200}
 //             />
-            
+
 //             {/* Card Content */}
 //             <View style={styles.content}>
 //               <View style={styles.topSection}>
@@ -196,7 +196,7 @@
 //                     </Text>
 //                   </View>
 //                 </View>
-                
+
 //                 <Text numberOfLines={2} style={[styles.title, { color: theme.text }]}>
 //                   {course.title}
 //                 </Text>
@@ -218,7 +218,7 @@
 //                     </Text>
 //                   </View>
 //                 </View>
-                
+
 //                 <View style={styles.priceRow}>
 //                   <Text style={[styles.price, { color: theme.text }]}>
 //                     {formatPrice(course.price)}
@@ -239,7 +239,7 @@
 //     gap: 24,
 //     paddingVertical: 8,
 //   },
-  
+
 //   // --- Header ---
 //   header: {
 //     flexDirection: "row",
@@ -286,7 +286,7 @@
 //     borderWidth: 1,
 //     borderRadius: 24,
 //     borderCurve: "continuous",
-    
+
 //     // Smooth, premium shadow cross-platform
 //     shadowColor: "#0F172A",
 //     shadowOffset: { width: 0, height: 8 },
@@ -298,7 +298,7 @@
 //     opacity: 0.9,
 //     transform: [{ scale: 0.97 }],
 //   },
-  
+
 //   // --- Image ---
 //   image: {
 //     width: 110,
@@ -306,7 +306,7 @@
 //     borderRadius: 16,
 //     borderCurve: "continuous",
 //   },
-  
+
 //   // --- Content ---
 //   content: {
 //     flex: 1,
@@ -347,7 +347,7 @@
 //     fontWeight: "700",
 //     letterSpacing: -0.2,
 //   },
-  
+
 //   // --- Meta & Footer ---
 //   bottomSection: {
 //     gap: 12,
@@ -389,8 +389,6 @@
 
 
 //Claude UI
-
-
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
@@ -415,7 +413,10 @@ function formatPrice(price: number) {
   return price > 0 ? `₹${price.toLocaleString("en-IN")}` : "Free";
 }
 
-export default function AllCoursesCatalog({ courses, onPress }: Props) {
+export default function AllCoursesCatalog({
+  courses,
+  onPress,
+}: Props) {
   const theme = useAppTheme();
 
   if (!courses.length) return null;
@@ -424,22 +425,49 @@ export default function AllCoursesCatalog({ courses, onPress }: Props) {
     <View style={styles.container}>
       <View style={styles.header}>
         <View>
-          <Text style={[styles.heading, { color: theme.text }]}>All Courses</Text>
-          <Text style={[styles.subtitle, { color: theme.textMuted }]}>
-            Explore {courses.length} published {courses.length === 1 ? "course" : "courses"}
+          <Text
+            style={[
+              styles.heading,
+              {
+                color: theme.text,
+              },
+            ]}
+          >
+            All Courses
+          </Text>
+
+          <Text
+            style={[
+              styles.subtitle,
+              {
+                color: theme.textMuted,
+              },
+            ]}
+          >
+            Explore {courses.length} published{" "}
+            {courses.length === 1 ? "course" : "courses"}
           </Text>
         </View>
+
         <View
           style={[
             styles.count,
             {
               backgroundColor: theme.primarySoft,
               shadowColor: theme.primary,
-              boxShadow: "0 4px 10px rgba(0,0,0,0.12)",
             },
           ]}
         >
-          <Text style={[styles.countText, { color: theme.primary }]}>{courses.length}</Text>
+          <Text
+            style={[
+              styles.countText,
+              {
+                color: theme.primary,
+              },
+            ]}
+          >
+            {courses.length}
+          </Text>
         </View>
       </View>
 
@@ -451,66 +479,163 @@ export default function AllCoursesCatalog({ courses, onPress }: Props) {
             accessibilityLabel={`Open ${course.title}`}
             onPress={() => onPress(course)}
             style={({ pressed }) => [
-              styles.card,
-              {
-                backgroundColor: theme.surface,
-                borderColor: theme.border,
-                shadowColor: "#0F172A",
-                boxShadow: "0 10px 24px rgba(15, 23, 42, 0.14)",
-              },
+              styles.pressable,
               pressed && styles.cardPressed,
             ]}
           >
-            <View style={styles.imageWrap}>
-              <Image source={{ uri: course.thumbnailUrl }} style={styles.image} contentFit="cover" />
-              <LinearGradient
-                colors={["transparent", "rgba(0,0,0,0.35)"]}
-                style={styles.imageOverlay}
-              />
+            <View
+              style={[
+                styles.shadowContainer,
+                {
+                  shadowColor: theme.isDark
+                    ? "#000"
+                    : "#111827",
+                },
+              ]}
+            >
               <View
                 style={[
-                  styles.level,
+                  styles.card,
                   {
-                    backgroundColor: "rgba(255,255,255,0.92)",
-                    boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
+                    backgroundColor: theme.surface,
+                    borderColor: theme.isDark
+                      ? "rgba(255,255,255,0.08)"
+                      : "#E5E7EB",
                   },
                 ]}
               >
-                <Text style={[styles.levelText, { color: theme.primary }]}>{course.level}</Text>
-              </View>
-            </View>
+                <View style={styles.imageWrap}>
+                  <Image
+                    source={{
+                      uri: course.thumbnailUrl,
+                    }}
+                    style={styles.image}
+                    contentFit="cover"
+                  />
 
-            <View style={styles.content}>
-              <View>
-                <Text numberOfLines={1} style={[styles.category, { color: theme.primary }]}>
-                  {course.category.name.toUpperCase()}
-                </Text>
-                <Text numberOfLines={2} style={[styles.title, { color: theme.text }]}>
-                  {course.title}
-                </Text>
-              </View>
+                  <LinearGradient
+                    colors={[
+                      "transparent",
+                      "rgba(0,0,0,0.55)",
+                    ]}
+                    style={styles.imageOverlay}
+                  />
 
-              <View style={styles.footerRow}>
-                <View style={styles.metaGroup}>
-                  <View style={styles.metaItem}>
-                    <Ionicons name="book-outline" size={13} color={theme.textMuted} />
-                    <Text style={[styles.metaText, { color: theme.textMuted }]}>
-                      {course.totalLessons} lessons
-                    </Text>
-                  </View>
-                  <View style={styles.metaDot} />
-                  <View style={styles.metaItem}>
-                    <Ionicons name="time-outline" size={13} color={theme.textMuted} />
-                    <Text style={[styles.metaText, { color: theme.textMuted }]}>
-                      {formatDuration(course.totalDuration)}
+                  <View
+                    style={[
+                      styles.level,
+                      {
+                        backgroundColor:
+                          "rgba(0,0,0,0.72)",
+                      },
+                    ]}
+                  >
+                    <Text style={styles.levelText}>
+                      {course.level}
                     </Text>
                   </View>
                 </View>
 
-                <View style={styles.priceRow}>
-                  <Text style={[styles.price, { color: theme.text }]}>{formatPrice(course.price)}</Text>
-                  <View style={[styles.chevronWrap, { backgroundColor: theme.primarySoft }]}>
-                    <Ionicons name="arrow-forward" size={14} color={theme.primary} />
+                <View style={styles.content}>
+                  <View>
+                    <Text
+                      numberOfLines={1}
+                      style={[
+                        styles.category,
+                        {
+                          color: theme.primary,
+                        },
+                      ]}
+                    >
+                      {course.category.name.toUpperCase()}
+                    </Text>
+
+                    <Text
+                      numberOfLines={2}
+                      style={[
+                        styles.title,
+                        {
+                          color: theme.text,
+                        },
+                      ]}
+                    >
+                      {course.title}
+                    </Text>
+                  </View>
+
+                  <View style={styles.footerRow}>
+                    <View style={styles.metaGroup}>
+                      <View style={styles.metaItem}>
+                        <Ionicons
+                          name="book-outline"
+                          size={14}
+                          color={theme.textMuted}
+                        />
+
+                        <Text
+                          style={[
+                            styles.metaText,
+                            {
+                              color: theme.textMuted,
+                            },
+                          ]}
+                        >
+                          {course.totalLessons} lessons
+                        </Text>
+                      </View>
+
+                      <View style={styles.metaDot} />
+
+                      <View style={styles.metaItem}>
+                        <Ionicons
+                          name="time-outline"
+                          size={14}
+                          color={theme.textMuted}
+                        />
+
+                        <Text
+                          style={[
+                            styles.metaText,
+                            {
+                              color: theme.textMuted,
+                            },
+                          ]}
+                        >
+                          {formatDuration(
+                            course.totalDuration
+                          )}
+                        </Text>
+                      </View>
+                    </View>
+
+                    <View style={styles.priceRow}>
+                      <Text
+                        style={[
+                          styles.price,
+                          {
+                            color: theme.text,
+                          },
+                        ]}
+                      >
+                        {formatPrice(course.price)}
+                      </Text>
+
+                      <View
+                        style={[
+                          styles.chevronWrap,
+                          {
+                            backgroundColor:
+                              theme.primarySoft,
+                          },
+                        ]}
+                      >
+                        <Ionicons
+                          name="arrow-forward"
+                          size={18}
+                          color={theme.primary}
+                        />
+                      </View>
+                    </View>
                   </View>
                 </View>
               </View>
@@ -523,86 +648,202 @@ export default function AllCoursesCatalog({ courses, onPress }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: { gap: 18 },
-  header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
-  heading: { fontSize: 23, fontWeight: "800", letterSpacing: -0.5 },
-  subtitle: { marginTop: 4, fontSize: 13.5, fontWeight: "500" },
+  container: {
+    gap: 20,
+    paddingBottom: 8,
+  },
+
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+
+  heading: {
+    fontSize: 24,
+    fontWeight: "800",
+    letterSpacing: -0.5,
+  },
+
+  subtitle: {
+    marginTop: 4,
+    fontSize: 14,
+    fontWeight: "500",
+  },
+
   count: {
-    minWidth: 38,
-    height: 38,
-    borderRadius: 19,
+    width: 42,
+    height: 42,
+    borderRadius: 21,
     alignItems: "center",
     justifyContent: "center",
-    shadowOffset: { width: 0, height: 4 },
+
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
     shadowOpacity: 0.18,
     shadowRadius: 8,
-    elevation: 3,
+    elevation: 5,
   },
-  countText: { fontSize: 14, fontWeight: "800", fontVariant: ["tabular-nums"] },
 
-  list: { gap: 16 },
+  countText: {
+    fontSize: 14,
+    fontWeight: "800",
+  },
 
-  card: {
-    borderWidth: 1,
+  list: {
+    gap: 20,
+  },
+
+  pressable: {
     borderRadius: 24,
-    borderCurve: "continuous",
-    backgroundColor: "#fff",
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.14,
-    shadowRadius: 20,
-    elevation: 8,
   },
-  cardPressed: { opacity: 0.92, transform: [{ scale: 0.98 }] },
+
+  /**
+   * Shadow container
+   * Don't use overflow:hidden here
+   */
+  shadowContainer: {
+    borderRadius: 24,
+
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+
+    shadowOpacity: 0.12,
+
+    shadowRadius: 18,
+
+    elevation: 10,
+
+    backgroundColor: "transparent",
+  },
+
+  /**
+   * Actual card
+   */
+  card: {
+    borderRadius: 24,
+
+    overflow: "hidden",
+
+    borderWidth: 1,
+
+    backgroundColor: "#fff",
+  },
+
+  cardPressed: {
+    transform: [{ scale: 0.98 }],
+    opacity: 0.96,
+  },
 
   imageWrap: {
     width: "100%",
-    height: 148,
+    height: 180,
+
     overflow: "hidden",
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    borderCurve: "continuous",
   },
-  image: { width: "100%", height: "100%" },
+
+  image: {
+    width: "100%",
+    height: "100%",
+  },
+
   imageOverlay: {
     position: "absolute",
+
     left: 0,
     right: 0,
     bottom: 0,
-    height: "55%",
-  },
 
-  content: { padding: 18, gap: 16 },
-
-  category: { fontSize: 11, fontWeight: "800", letterSpacing: 0.6 },
-  title: { marginTop: 6, fontSize: 17, lineHeight: 22, fontWeight: "700" },
-
-  footerRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
-  metaGroup: { flexDirection: "row", alignItems: "center", gap: 8 },
-  metaItem: { flexDirection: "row", alignItems: "center", gap: 4 },
-  metaDot: { width: 3, height: 3, borderRadius: 1.5, backgroundColor: "#C4C9D4" },
-  metaText: { fontSize: 12, fontWeight: "500" },
-
-  priceRow: { flexDirection: "row", alignItems: "center", gap: 10 },
-  price: { fontSize: 15, fontWeight: "800" },
-  chevronWrap: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    alignItems: "center",
-    justifyContent: "center",
+    height: "65%",
   },
 
   level: {
     position: "absolute",
-    top: 12,
-    left: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 12,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.12,
-    shadowRadius: 4,
-    elevation: 2,
+
+    top: 14,
+    left: 14,
+
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+
+    borderRadius: 18,
   },
-  levelText: { fontSize: 11, fontWeight: "700" },
+
+  levelText: {
+    color: "#fff",
+    fontSize: 11,
+    fontWeight: "700",
+  },
+
+  content: {
+    padding: 18,
+    gap: 18,
+  },
+
+  category: {
+    fontSize: 11,
+    fontWeight: "800",
+    letterSpacing: 0.8,
+  },
+
+  title: {
+    marginTop: 8,
+    fontSize: 18,
+    fontWeight: "700",
+    lineHeight: 25,
+  },
+
+  footerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+
+  metaGroup: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+
+  metaItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+  },
+
+  metaDot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: "#CBD5E1",
+  },
+
+  metaText: {
+    fontSize: 12,
+    fontWeight: "500",
+  },
+
+  priceRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+
+  price: {
+    fontSize: 16,
+    fontWeight: "800",
+  },
+
+  chevronWrap: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+
+    alignItems: "center",
+    justifyContent: "center",
+  },
 });

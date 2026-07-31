@@ -32,7 +32,7 @@ export default function SubscriptionDetails({ subscription }: Props) {
 
   return (
     <View style={styles.menuRow}>
-      <View style={[styles.iconCircle, { backgroundColor: "#26C6DA" }]}>
+      <View style={[styles.iconCircle, { backgroundColor: theme.accentRose }]}>
         <Feather name="award" size={22} color="#FFFFFF" />
       </View>
 

@@ -25,7 +25,7 @@ export default function LogoutButton({
       accessibilityRole="button"
       accessibilityLabel="Sign out"
     >
-      <View style={[styles.iconCircle, { backgroundColor: "#FF6B6B" }]}>
+      <View style={[styles.iconCircle, { backgroundColor: theme.accentCrimson }]}>
         <Feather
           name="log-out"
           size={20}

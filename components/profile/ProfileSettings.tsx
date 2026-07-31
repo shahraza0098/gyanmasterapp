@@ -19,9 +19,9 @@ export default function ProfileSettings({ profile }: Props) {
 
   return (
     <View style={styles.container}>
-      {/* PROFILE / Email Row (Orange icon) */}
+      {/* PROFILE / Email Row (Teal icon) */}
       <View style={styles.menuRow}>
-        <View style={[styles.iconCircle, { backgroundColor: "#FFB74D" }]}>
+        <View style={[styles.iconCircle, { backgroundColor: theme.accentTeal }]}>
           <Feather name="at-sign" size={22} color="#FFFFFF" />
         </View>
 
@@ -33,9 +33,9 @@ export default function ProfileSettings({ profile }: Props) {
         </View>
       </View>
 
-      {/* Phone Number Row (Pink icon) */}
+      {/* Phone Number Row (Gold icon) */}
       <View style={styles.menuRow}>
-        <View style={[styles.iconCircle, { backgroundColor: "#FF60D2" }]}>
+        <View style={[styles.iconCircle, { backgroundColor: theme.accentGold }]}>
           <Feather name="phone" size={20} color="#FFFFFF" />
         </View>
 
@@ -47,9 +47,9 @@ export default function ProfileSettings({ profile }: Props) {
         </View>
       </View>
 
-      {/* Appearance / Theme preference Row (Purple icon) */}
+      {/* Appearance / Theme preference Row (Plum icon) */}
       <View style={styles.menuRow}>
-        <View style={[styles.iconCircle, { backgroundColor: "#8C7DFF" }]}>
+        <View style={[styles.iconCircle, { backgroundColor: theme.accentPlum }]}>
           <Feather
             name={theme.isDark ? "moon" : "sun"}
             size={22}

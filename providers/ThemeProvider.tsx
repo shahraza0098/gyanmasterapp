@@ -26,34 +26,49 @@ export type AppTheme = {
   primarySoft: string;
   danger: string;
   dangerSoft: string;
+  accentRose: string;
+  accentGold: string;
+  accentTeal: string;
+  accentPlum: string;
+  accentCrimson: string;
 };
 
 const lightTheme: AppTheme = {
   isDark: false,
-  background: "#F8FAFC",
+  background: "#E8E9EB",
   surface: "#FFFFFF",
-  surfaceMuted: "#F1F5F9",
-  border: "#E2E8F0",
-  text: "#0F172A",
-  textMuted: "#64748B",
-  primary: "#2563EB",
-  primarySoft: "#DBEAFE",
-  danger: "#DC2626",
-  dangerSoft: "#FEF2F2",
+  surfaceMuted: "#CCCDC6",
+  border: "#CCCDC6",
+  text: "#262626",
+  textMuted: "#746D69",
+  primary: "#066466",
+  primarySoft: "#0664661F",
+  danger: "#950E1D",
+  dangerSoft: "#950E1D1F",
+  accentRose: "#AB606F",
+  accentGold: "#DEB041",
+  accentTeal: "#066466",
+  accentPlum: "#6A2B56",
+  accentCrimson: "#950E1D",
 };
 
 const darkTheme: AppTheme = {
   isDark: true,
-  background: "#0F172A",
-  surface: "#172033",
-  surfaceMuted: "#243047",
-  border: "#334155",
-  text: "#F8FAFC",
-  textMuted: "#CBD5E1",
-  primary: "#60A5FA",
-  primarySoft: "#1E3A5F",
-  danger: "#FCA5A5",
-  dangerSoft: "#451A1A",
+  background: "#262626",
+  surface: "#333230",
+  surfaceMuted: "#746D69",
+  border: "#746D69",
+  text: "#E8E9EB",
+  textMuted: "#ACADA8",
+  primary: "#DEB041",
+  primarySoft: "#DEB04126",
+  danger: "#AB606F",
+  dangerSoft: "#AB606F26",
+  accentRose: "#AB606F",
+  accentGold: "#DEB041",
+  accentTeal: "#066466",
+  accentPlum: "#6A2B56",
+  accentCrimson: "#950E1D",
 };
 
 type ThemeContextValue = AppTheme & {

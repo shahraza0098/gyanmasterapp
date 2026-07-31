@@ -44,7 +44,14 @@ export default function CourseHorizontalList({
         contentContainerStyle={styles.list}
         renderItem={({ item }) => (
           <Pressable
-            style={[styles.card, { backgroundColor: theme.surface }]}
+            style={[
+              styles.card,
+              {
+                backgroundColor: theme.surface,
+                borderColor: theme.border,
+                shadowColor: theme.isDark ? "#000000" : "#0F172A",
+              },
+            ]}
             onPress={() => onPress(item)}
           >
             <Image
@@ -137,11 +144,15 @@ const styles = StyleSheet.create({
 
   card: {
     width: 270,
-    backgroundColor: "#fff",
     borderRadius: 20,
+    borderWidth: 1,
     overflow: "hidden",
     marginRight: 16,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 4,
+    marginBottom: 8,
   },
 
   image: {

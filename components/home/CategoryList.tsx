@@ -26,7 +26,13 @@ export default function CategoryList({
         contentContainerStyle={styles.list}
         renderItem={({ item }) => (
           <Pressable
-            style={styles.card}
+            style={[
+              styles.card,
+              {
+                borderColor: theme.border,
+                shadowColor: theme.isDark ? "#000000" : "#0F172A",
+              },
+            ]}
             onPress={() => onPress(item)}
           >
             <Image
@@ -67,8 +73,13 @@ const styles = StyleSheet.create({
     width: 140,
     height: 90,
     borderRadius: 18,
+    borderWidth: 1,
     overflow: "hidden",
     marginRight: 14,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
   },
 
   image: {

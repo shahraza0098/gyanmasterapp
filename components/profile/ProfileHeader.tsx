@@ -21,7 +21,7 @@ export default function ProfileHeader({
   const theme = useAppTheme();
 
   return (
-    <View style={styles.card}>
+    <View style={[styles.card, { backgroundColor: theme.isDark ? theme.accentPlum : theme.accentTeal }]}>
       {/* Subtle decorative background circles */}
       <View style={styles.decorCircleTopRight} />
       <View style={styles.decorCircleBottomRight} />
