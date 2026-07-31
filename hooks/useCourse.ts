@@ -7,6 +7,7 @@ import {
 import CourseService from "@/services/course.service";
 
 import { CourseDetails } from "@/types/course";
+import { getErrorMessage } from "@/utils/errorMessages";
 
 export function useCourse(courseId: string) {
   const [course, setCourse] =
@@ -31,11 +32,8 @@ export function useCourse(courseId: string) {
         );
 
       setCourse(data);
-    } catch (err: any) {
-      setError(
-        err?.response?.data?.message ||
-          err.message
-      );
+    } catch (err: unknown) {
+      setError(getErrorMessage(err));
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -46,11 +44,11 @@ export function useCourse(courseId: string) {
     fetchCourse();
   }, [fetchCourse]);
 
-  async function refresh() {
+  const refresh = useCallback(async () => {
     setRefreshing(true);
 
     await fetchCourse();
-  }
+  }, [fetchCourse]);
 
   return {
     course,

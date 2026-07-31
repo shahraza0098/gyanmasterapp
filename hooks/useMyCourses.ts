@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { getMyCourses } from "@/services/mycourse.service";
 
 import { MyCoursesResponse } from "@/types/MyCourse";
+import { getErrorMessage } from "@/utils/errorMessages";
 
 export function useMyCourse() {
   const [courses, setCourses] =
@@ -24,13 +25,10 @@ export function useMyCourse() {
       const data = await getMyCourses();
 
       setCourses(data);
-    } catch (error: any) {
-      console.log(error);
+    } catch (err: unknown) {
+      console.log(err);
 
-      setError(
-        error?.response?.data?.message ??
-          "Failed to fetch courses."
-      );
+      setError(getErrorMessage(err));
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -41,11 +39,11 @@ export function useMyCourse() {
     loadCourses();
   }, [loadCourses]);
 
-  const refresh = () => {
+  const refresh = useCallback(async () => {
     setRefreshing(true);
 
-    loadCourses();
-  };
+    await loadCourses();
+  }, [loadCourses]);
 
   return {
     courses,

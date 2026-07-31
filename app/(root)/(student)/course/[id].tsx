@@ -423,7 +423,6 @@
 
 import { useMemo } from "react";
 import {
-  ActivityIndicator,
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -437,6 +436,8 @@ import { useCourse } from "@/hooks/useCourse";
 import CourseHeader from "@/components/course/CourseHeader";
 import CourseInfo from "@/components/course/CourseInfo";
 import SectionAccordion from "@/components/course/SectionAccordion";
+import ErrorState from "@/components/ErrorState";
+import LoadingState from "@/components/LoadingState";
 import { useAppTheme } from "@/providers/ThemeProvider";
 
 export default function CourseScreen() {
@@ -497,23 +498,18 @@ export default function CourseScreen() {
   }, [lessonCount, completedLessons]);
 
   if (loading) {
-    return (
-      <SafeAreaView style={[styles.center, { backgroundColor: theme.background }]}>
-        <ActivityIndicator
-          size="large"
-          color={theme.primary}
-        />
-      </SafeAreaView>
-    );
+    return <LoadingState message="Loading course…" />;
   }
 
   if (error || !course) {
     return (
-      <SafeAreaView style={[styles.center, { backgroundColor: theme.background }]}>
-        <Text style={[styles.errorText, { color: theme.danger, backgroundColor: theme.dangerSoft }]}>
-          {error ?? "Course not found"}
-        </Text>
-      </SafeAreaView>
+      <ErrorState
+        title="Couldn't load this course"
+        message={error ?? "Course not found"}
+        onRetry={refresh}
+        onRefresh={refresh}
+        refreshing={refreshing}
+      />
     );
   }
 
@@ -575,40 +571,21 @@ export default function CourseScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FAFAFA", // A cleaner, warmer off-white instead of standard gray
-  },
-
-  content: {
-    paddingHorizontal: 20, // Increased side padding for a more premium, framed look
-    paddingTop: 16,
-    paddingBottom: 56, // Extra bottom padding so content isn't cramped near the bezel
-  },
-
-  center: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
     backgroundColor: "#FAFAFA",
   },
 
-  errorText: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: "#B91C1C", 
-    backgroundColor: "#FEF2F2", // Soft red background to create a "pill" alert
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 16,
-    overflow: "hidden",
-    textAlign: "center",
+  content: {
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 56,
   },
 
   sectionTitle: {
     fontSize: 22,
-    fontWeight: "800", // Thicker font weight for distinct visual hierarchy
-    color: "#0F172A", // Deep slate for higher contrast against the background
+    fontWeight: "800",
+    color: "#0F172A",
     marginBottom: 16,
-    marginTop: 32, // Added more breathing room between the info card and the content list
-    letterSpacing: -0.5, // Tighter letter spacing gives off an immediate "modern/sleek" aesthetic
+    marginTop: 32,
+    letterSpacing: -0.5,
   },
 });

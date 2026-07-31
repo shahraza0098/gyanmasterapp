@@ -13,11 +13,9 @@
 
 import React from "react";
 import {
-  ActivityIndicator,
   RefreshControl,
   ScrollView,
   StyleSheet,
-  Text,
   View,
 } from "react-native";
 
@@ -33,6 +31,8 @@ import SubscriptionDetails from "@/components/profile/SubscriptionDetails";
 import { useProfile } from "@/hooks/useProfile";
 import { useAppTheme } from "@/providers/ThemeProvider";
 import { useStudentContext } from "@/providers/StudentProvider";
+import ErrorState from "@/components/ErrorState";
+import LoadingState from "@/components/LoadingState";
 
 export default function ProfileScreen() {
   const theme = useAppTheme();
@@ -48,21 +48,18 @@ export default function ProfileScreen() {
   const { signOut } = useClerk();
 
   if (loading) {
-    return (
-      <SafeAreaView style={[styles.center, { backgroundColor: theme.background }]}>
-        <ActivityIndicator
-          size="large"
-          color={theme.primary}
-        />
-      </SafeAreaView>
-    );
+    return <LoadingState message="Loading profile…" />;
   }
 
-  if (!profile) {
+  if (!profile || error) {
     return (
-      <SafeAreaView style={[styles.center, { backgroundColor: theme.background }]}>
-        <Text style={{ color: theme.danger }}>{error}</Text>
-      </SafeAreaView>
+      <ErrorState
+        title="Couldn't load your profile"
+        message={error}
+        onRetry={refresh}
+        onRefresh={refresh}
+        refreshing={refreshing}
+      />
     );
   }
 
@@ -105,10 +102,5 @@ const styles = StyleSheet.create({
   menuContainer: {
     marginTop: 14,
     gap: 12,
-  },
-  center: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
   },
 });

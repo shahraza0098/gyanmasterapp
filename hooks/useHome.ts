@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import HomeService from "@/services/home.service";
 import { HomeResponse } from "@/types/home";
+import { getErrorMessage } from "@/utils/errorMessages";
 
 export function useHome() {
   const [home, setHome] = useState<HomeResponse | null>(null);
@@ -19,14 +20,10 @@ export function useHome() {
       const data = await HomeService.getHome();
 
       setHome(data);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.log("Home Error:", err);
 
-      setError(
-        err?.response?.data?.message ||
-          err?.message ||
-          "Something went wrong."
-      );
+      setError(getErrorMessage(err));
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -37,11 +34,11 @@ export function useHome() {
     fetchHome();
   }, [fetchHome]);
 
-  const refresh = async () => {
+  const refresh = useCallback(async () => {
     setRefreshing(true);
 
     await fetchHome();
-  };
+  }, [fetchHome]);
 
   return {
     home,

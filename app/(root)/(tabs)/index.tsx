@@ -160,7 +160,6 @@
 
 import { useState } from "react";
 import {
-  ActivityIndicator,
   RefreshControl,
 
   ScrollView,
@@ -181,6 +180,8 @@ import ContinueLearningCard from "@/components/home/ContinueLearningCard";
 import CategoryList from "@/components/home/CategoryList";
 import CourseHorizontalList from "@/components/home/CourseHorizontalList";
 import AllCoursesCatalog from "@/components/home/AllCoursesCatalog";
+import ErrorState from "@/components/ErrorState";
+import LoadingState from "@/components/LoadingState";
 import { useAppTheme } from "@/providers/ThemeProvider";
 
 export default function HomeScreen() {
@@ -202,26 +203,18 @@ export default function HomeScreen() {
   const [search, setSearch] = useState("");
 
   if (loading) {
-    return (
-      <SafeAreaView style={[styles.center, { backgroundColor: theme.background }]}>
-        <StatusBar barStyle={theme.isDark ? "light-content" : "dark-content"} />
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={theme.primary} />
-          <Text style={[styles.loadingText, { color: theme.textMuted }]}>Curating your experience...</Text>
-        </View>
-      </SafeAreaView>
-    );
+    return <LoadingState message="Curating your experience…" />;
   }
 
   if (error) {
     return (
-      <SafeAreaView style={[styles.center, { backgroundColor: theme.background }]}>
-        <StatusBar barStyle={theme.isDark ? "light-content" : "dark-content"} />
-        <View style={[styles.errorContainer, { backgroundColor: theme.dangerSoft, borderColor: theme.danger }]}>
-          <Text style={[styles.errorTitle, { color: theme.danger }]}>Oops! Something went wrong</Text>
-          <Text style={[styles.errorText, { color: theme.danger }]}>{error}</Text>
-        </View>
-      </SafeAreaView>
+      <ErrorState
+        title="Couldn't load your feed"
+        message={error}
+        onRetry={refresh}
+        onRefresh={refresh}
+        refreshing={refreshing}
+      />
     );
   }
 
@@ -306,60 +299,12 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F8FAFC", // Clean, modern slate-50 background
-  },
-  content: {
-    paddingHorizontal: 24, // Slightly wider padding for an elegant frame
-    paddingTop: 16,
-    paddingBottom: 48,
-    gap: 28, // Adds perfect, consistent spacing between all child components automatically
-  },
-  center: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
     backgroundColor: "#F8FAFC",
   },
-  
-  // --- Loading State Styles ---
-  loadingContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 16,
-  },
-  loadingText: {
-    fontSize: 15,
-    color: "#64748B",
-    fontWeight: "500",
-    letterSpacing: 0.3,
-  },
-
-  // --- Error State Styles ---
-  errorContainer: {
-    marginHorizontal: 24,
-    paddingVertical: 24,
-    paddingHorizontal: 20,
-    backgroundColor: "#FEF2F2",
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: "#FEE2E2",
-    alignItems: "center",
-    shadowColor: "#EF4444",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 12,
-    elevation: 2,
-  },
-  errorTitle: {
-    color: "#991B1B",
-    fontSize: 18,
-    fontWeight: "700",
-    marginBottom: 8,
-  },
-  errorText: {
-    color: "#B91C1C",
-    fontSize: 15,
-    textAlign: "center",
-    lineHeight: 22,
+  content: {
+    paddingHorizontal: 24,
+    paddingTop: 16,
+    paddingBottom: 48,
+    gap: 28,
   },
 });

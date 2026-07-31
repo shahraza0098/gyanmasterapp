@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { getProfile } from "@/services/profile.service";
 
 import { Profile } from "@/types/profile";
+import { getErrorMessage } from "@/utils/errorMessages";
 
 export function useProfile() {
   const [profile, setProfile] =
@@ -15,19 +16,16 @@ export function useProfile() {
     useState(false);
 
   const [error, setError] =
-    useState("");
+    useState<string | null>(null);
 
   const loadProfile =
     useCallback(async () => {
       try {
-        setError("");
-        const data =await getProfile();
+        setError(null);
+        const data = await getProfile();
         setProfile(data);
-      } catch (error: any) {
-        setError(
-          error?.response?.data?.message ??
-            "Failed to load profile."
-        );
+      } catch (err: unknown) {
+        setError(getErrorMessage(err));
       } finally {
         setLoading(false);
         setRefreshing(false);
@@ -38,11 +36,11 @@ export function useProfile() {
     loadProfile();
   }, [loadProfile]);
 
-  const refresh = () => {
+  const refresh = useCallback(async () => {
     setRefreshing(true);
 
-    loadProfile();
-  };
+    await loadProfile();
+  }, [loadProfile]);
 
   return {
     profile,

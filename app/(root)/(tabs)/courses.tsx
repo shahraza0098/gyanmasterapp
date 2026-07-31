@@ -14,10 +14,8 @@
 
 import React, { useMemo, useState } from "react";
 import {
-  ActivityIndicator,
   RefreshControl,
   StyleSheet,
-  Text,
   View,
   FlatList,
 } from "react-native";
@@ -34,6 +32,8 @@ import MyCourseCard from "@/components/mycourse/MyCourseCard";
 import EmptyMyCourse from "@/components/mycourse/EmptyMyCourse";
 
 import { useMyCourse } from "@/hooks/useMyCourses";
+import ErrorState from "@/components/ErrorState";
+import LoadingState from "@/components/LoadingState";
 
 import { router } from "expo-router";
 import { useAppTheme } from "@/providers/ThemeProvider";
@@ -68,23 +68,18 @@ export default function CoursesScreen() {
   }, [courses, tab]);
 
   if (loading) {
-    return (
-      <SafeAreaView style={[styles.center, { backgroundColor: theme.background }]}>
-        <ActivityIndicator
-          size="large"
-          color={theme.primary}
-        />
-      </SafeAreaView>
-    );
+    return <LoadingState message="Loading your courses…" />;
   }
 
   if (error) {
     return (
-      <SafeAreaView style={[styles.center, { backgroundColor: theme.background }]}>
-        <Text style={[styles.error, { color: theme.danger }]}>
-          {error}
-        </Text>
-      </SafeAreaView>
+      <ErrorState
+        title="Couldn't load courses"
+        message={error}
+        onRetry={refresh}
+        onRefresh={refresh}
+        refreshing={refreshing}
+      />
     );
   }
 
@@ -192,23 +187,4 @@ const styles = StyleSheet.create({
     marginBottom: 18,
   },
 
-  center: {
-    flex: 1,
-
-    justifyContent: "center",
-
-    alignItems: "center",
-
-    backgroundColor:
-      "#F8FAFC",
-  },
-
-  error: {
-    color: "#EF4444",
-
-    fontSize: 16,
-
-    fontFamily:
-      "Poppins-Medium",
-  },
 });

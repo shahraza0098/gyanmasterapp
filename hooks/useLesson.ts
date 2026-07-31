@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import LessonService from "@/services/lesson.service";
 
 import type { Lesson } from "@/types/lesson";
+import { getErrorMessage } from "@/utils/errorMessages";
 
 interface UseLessonReturn {
   lesson: Lesson | null;
@@ -65,14 +66,10 @@ export function useLesson(
         if (!mountedRef.current) return;
 
         setLesson(data);
-      } catch (err: any) {
+      } catch (err: unknown) {
         if (!mountedRef.current) return;
 
-        setError(
-          err?.response?.data?.message ??
-            err?.message ??
-            "Failed to load lesson."
-        );
+        setError(getErrorMessage(err));
       } finally {
         if (!mountedRef.current) return;
 

@@ -1,37 +1,51 @@
 import { useState } from "react";
-import { 
-  ActivityIndicator, 
-  Alert, 
-  TouchableOpacity, 
-  Text, 
-  TextInput, 
-  View, 
-  StyleSheet, 
-  KeyboardAvoidingView, 
-  Platform, 
-  ScrollView 
+import {
+  ActivityIndicator,
+  Alert,
+  TouchableOpacity,
+  Text,
+  TextInput,
+  View,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView
 } from "react-native";
 import { router } from "expo-router";
 import { useAuth } from "@clerk/expo";
 import { API_URL } from "../config/api";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAppTheme } from "@/providers/ThemeProvider";
+import { getErrorMessage } from "@/utils/errorMessages";
 
 export default function OnboardingScreen() {
   const theme = useAppTheme();
   const { getToken } = useAuth();
   const [name, setName] = useState("");
-  // const [email, setEmail] = useState("");
+
   const [phone, setPhone] = useState("");
-  // const [username, setUsername] = useState("");
+
   const [loading, setLoading] = useState(false);
 
   console.log("API_URL:", API_URL);
   console.log("name:", name);
 
   const handleContinue = async () => {
-    if (!name.trim() || !phone.trim()) {
-      Alert.alert("Missing info", "Please enter your name and phone to continue.");
+    const trimmedName = name.trim();
+    const cleanPhone = phone.replace(/\D/g, "");
+
+    if (!trimmedName) {
+      Alert.alert("Missing Info", "Please enter your full name to continue.");
+      return;
+    }
+
+    if (!cleanPhone) {
+      Alert.alert("Missing Info", "Please enter your phone number to continue.");
+      return;
+    }
+
+    if (cleanPhone.length !== 10) {
+      Alert.alert("Invalid Phone Number", "Phone number must be exactly 10 digits.");
       return;
     }
 
@@ -45,7 +59,7 @@ export default function OnboardingScreen() {
       }
 
       console.log("Token:", token);
-      
+
       const response = await fetch(`${API_URL}/api/student/onboard`, {
         method: "POST",
         headers: {
@@ -53,10 +67,8 @@ export default function OnboardingScreen() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          name: name.trim(),
-          // email: email.trim(),
-          phone: phone.trim(),
-          // username: username.trim(),
+          name: trimmedName,
+          phone: cleanPhone,
         }),
       });
 
@@ -66,12 +78,13 @@ export default function OnboardingScreen() {
       console.log("Status:", response.status);
 
       if (!response.ok) {
-        throw new Error(data?.message || "Unable to save profile");
+        const rawMsg = data?.message || data?.error || "Unable to save profile";
+        throw new Error(rawMsg);
       }
 
       router.replace("/(root)/(tabs)");
     } catch (error) {
-      Alert.alert("Onboarding failed", error instanceof Error ? error.message : "Please try again.");
+      Alert.alert("Onboarding failed", getErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -84,11 +97,11 @@ export default function OnboardingScreen() {
       <View style={[styles.blob, styles.blobBottomRight]} />
       <View style={[styles.blob, styles.blobCenter]} />
 
-      <KeyboardAvoidingView 
-        style={styles.keyboardAvoidingView} 
+      <KeyboardAvoidingView
+        style={styles.keyboardAvoidingView}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-        <ScrollView 
+        <ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
@@ -113,42 +126,18 @@ export default function OnboardingScreen() {
                 />
               </View>
 
-              {/* <View style={styles.inputGroup}>
-                <Text style={[styles.label, { color: theme.textMuted }]}>Email Address</Text>
-                <TextInput
-                  placeholder="john@example.com"
-                  placeholderTextColor={theme.textMuted}
-                  value={email}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  onChangeText={setEmail}
-                  style={[styles.input, { backgroundColor: theme.surfaceMuted, borderColor: theme.border, color: theme.text }]}
-                />
-              </View> */}
-
               <View style={styles.inputGroup}>
-                <Text style={[styles.label, { color: theme.textMuted }]}>Phone <Text style={[styles.optional, { color: theme.textMuted }]}>(Optional)</Text></Text>
+                <Text style={[styles.label, { color: theme.textMuted }]}>Phone Number</Text>
                 <TextInput
-                  placeholder="+91 1231-481-102"
+                  placeholder="9876543210"
                   placeholderTextColor={theme.textMuted}
                   value={phone}
-                  keyboardType="phone-pad"
-                  onChangeText={setPhone}
+                  keyboardType="number-pad"
+                  maxLength={10}
+                  onChangeText={(text) => setPhone(text.replace(/\D/g, ""))}
                   style={[styles.input, { backgroundColor: theme.surfaceMuted, borderColor: theme.border, color: theme.text }]}
                 />
               </View>
-
-              {/* <View style={styles.inputGroup}>
-                <Text style={[styles.label, { color: theme.textMuted }]}>Username <Text style={[styles.optional, { color: theme.textMuted }]}>(Optional)</Text></Text>
-                <TextInput
-                  placeholder="@johndoe"
-                  placeholderTextColor={theme.textMuted}
-                  value={username}
-                  autoCapitalize="none"
-                  onChangeText={setUsername}
-                  style={[styles.input, { backgroundColor: theme.surfaceMuted, borderColor: theme.border, color: theme.text }]}
-                />
-              </View> */}
             </View>
           </View>
 
