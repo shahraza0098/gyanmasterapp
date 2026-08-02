@@ -672,7 +672,7 @@
 //             <Text style={styles.priceCardSubtitle}>
 //               {PLAN.trialDays}-day trial
 //             </Text>
-            
+
 //             <View style={styles.giantPriceRow}>
 //               {/* Accents surrounding the price as seen in screenshot */}
 //               <Feather name="minimize-2" size={20} color={COLORS.accent} style={{ transform: [{ rotate: '45deg' }] }} />
@@ -758,7 +758,7 @@
 //     <View style={styles.timeline}>
 //       {/* Absolute line connector traversing across */}
 //       <View style={styles.timelineTrack} />
-      
+
 //       {Array.from({ length: PLAN.trialDays }).map((_, i) => (
 //         <View key={i} style={styles.timelineNode}>
 //           <View style={styles.timelineDot} />
@@ -1146,11 +1146,11 @@ export default function SubscriptionScreen() {
         name: "Premium",
         description: `₹${trialAmount} today, then ₹${monthlyAmount}/mo`,
         theme: { color: COLORS.accent },
-          prefill: {
-    email: student?.email,
-    contact: student?.phone,
-    name: student?.name,
-  },
+        prefill: {
+          email: student?.email,
+          contact: student?.phone,
+          name: student?.name,
+        },
       });
 
       console.log("result coming: ", result);
@@ -1203,13 +1203,13 @@ export default function SubscriptionScreen() {
           showsVerticalScrollIndicator={false}
         >
           <View className="flex-row items-center justify-between mb-4">
-            <Pressable
+            {/* <Pressable
               onPress={() => router.back()}
               hitSlop={12}
               className="w-9 h-9 rounded-full bg-transparent items-center justify-center -ml-2"
             >
               <Feather name="x" size={20} color={COLORS.text} />
-            </Pressable>
+            </Pressable> */}
             <Pressable
               onPress={() => signOut()}
               className="w-10 h-10 rounded-full bg-[#E5636B] items-center justify-center"
@@ -1300,9 +1300,8 @@ export default function SubscriptionScreen() {
             <Pressable
               onPress={handleSubscribe}
               disabled={busy}
-              className={`bg-[#FFDE4E] rounded-lg py-4 items-center justify-center mb-5 mt-2 active:opacity-85 ${
-                busy ? "opacity-60" : "opacity-100"
-              }`}
+              className={`bg-[#FFDE4E] rounded-lg py-4 items-center justify-center mb-5 mt-2 active:opacity-85 ${busy ? "opacity-60" : "opacity-100"
+                }`}
             >
               {busy ? (
                 <ActivityIndicator color={COLORS.bg} />
@@ -1370,12 +1369,11 @@ function Banner({
 }) {
   const isDanger = tone === "danger";
   const color = isDanger ? COLORS.danger : COLORS.accent;
-  
+
   return (
     <View
-      className={`flex-row items-center gap-2 border rounded-lg p-4 mb-6 ${
-        isDanger ? "border-[#E5636B]" : "border-[#FFC72C]"
-      }`}
+      className={`flex-row items-center gap-2 border rounded-lg p-4 mb-6 ${isDanger ? "border-[#E5636B]" : "border-[#FFC72C]"
+        }`}
     >
       <Feather
         name={isDanger ? "alert-circle" : "info"}
@@ -1386,9 +1384,8 @@ function Banner({
       {action && (
         <Pressable onPress={onPress}>
           <Text
-            className={`text-sm font-semibold ${
-              isDanger ? "text-[#E5636B]" : "text-[#FFC72C]"
-            }`}
+            className={`text-sm font-semibold ${isDanger ? "text-[#E5636B]" : "text-[#FFC72C]"
+              }`}
           >
             {action} &gt;
           </Text>
@@ -1410,8 +1407,8 @@ function SuccessState({ onDone }: { onDone: () => void }) {
           Your {PLAN.trialDays}-day trial has started. We&apos;ll remind you
           before the first ₹{PLAN.monthlyAmount} charge.
         </Text>
-        <Pressable 
-          onPress={onDone} 
+        <Pressable
+          onPress={onDone}
           className="bg-[#FFDE4E] rounded-lg py-4 px-8 items-center justify-center mb-5 active:opacity-85"
         >
           <Text className="text-[#09090E] text-base font-bold">Start learning</Text>
