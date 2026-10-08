@@ -162,7 +162,7 @@ export default function OnboardingScreen() {
             style={[styles.button, { backgroundColor: loading ? "#93C5FD" : theme.primary }, loading && styles.buttonDisabled]}
           >
             {loading ? (
-              <ActivityIndicator color="#fff" />
+              <ActivityIndicator color="#cdf8e0ff" />
             ) : (
               <Text style={styles.buttonText}>Complete Profile</Text>
             )}
