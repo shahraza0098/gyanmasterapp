@@ -68,9 +68,16 @@ export default function RootLayout() {
   console.log("root layout student console: ", student)
   const segments = useSegments();
 
-  // Check RevenueCat entitlement on mount and when student changes
+  // Backend decides access (trial window or paid ₹499 period is current).
+  const serverAccess = student
+    ? student.access?.hasAccess ??
+      hasPlatformAccess(student.subscription)
+    : false;
+
+  // Only if the backend says "no access", ask RevenueCat directly. This covers
+  // the few seconds after a purchase before the webhook reaches the backend.
   useEffect(() => {
-    if (!student || !student.onboardingComplete) {
+    if (!student || !student.onboardingComplete || serverAccess) {
       setRcPremium(null);
       return;
     }
@@ -88,7 +95,7 @@ export default function RootLayout() {
     return () => {
       cancelled = true;
     };
-  }, [student?.id, student?.onboardingComplete]);
+  }, [student?.id, student?.onboardingComplete, serverAccess]);
 
   if (loading) {
     return (
@@ -125,11 +132,13 @@ export default function RootLayout() {
     );
   }
 
+  if (serverAccess) {
+    return <Slot />;
+  }
+
   /**
-   * Subscription — RevenueCat is the primary check.
-   * Falls back to the existing backend subscription check.
-   * While RevenueCat is still loading (rcPremium === null),
-   * show a loading indicator to avoid a flash redirect.
+   * Backend said no access — wait for the RevenueCat fallback check
+   * to avoid a flash redirect right after purchase.
    */
   if (rcPremium === null) {
     return (
@@ -146,10 +155,7 @@ export default function RootLayout() {
     );
   }
 
-  const hasAccess =
-    rcPremium || hasPlatformAccess(student.subscription);
-
-  if (!hasAccess) {
+  if (!rcPremium) {
     return (
       <Redirect
         href="/subscription"

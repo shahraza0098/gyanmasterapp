@@ -29,7 +29,7 @@ export interface Subscription {
 
   status: SubscriptionStatus;
 
-  razorpaySubscriptionId: string;
+  razorpaySubscriptionId?: string | null;
 
   trialStartAt?: string | null;
 
@@ -50,6 +50,14 @@ export interface Subscription {
   plan?: Plan | null;
 }
 
+export interface SubscriptionAccess {
+  hasAccess: boolean;
+
+  state: "NONE" | "TRIAL" | "ACTIVE" | "TRIAL_EXPIRED" | "EXPIRED";
+
+  accessEndsAt: string | null;
+}
+
 export interface Student {
   id: string;
 
@@ -68,6 +76,8 @@ export interface Student {
   onboardingComplete: boolean;
 
   subscription?: Subscription | null;
+
+  access?: SubscriptionAccess | null;
 }
 
 export interface StudentResponse {
@@ -75,5 +85,7 @@ export interface StudentResponse {
 
   data: {
     user: Student;
+
+    access?: SubscriptionAccess | null;
   };
 }

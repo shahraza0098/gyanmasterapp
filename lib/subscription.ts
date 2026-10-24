@@ -119,69 +119,60 @@
 
 import { Subscription } from "@/types/Student";
 
-const ACTIVE_STATUSES = [
-  "AUTHENTICATED",
-  "ACTIVE",
-] as const;
+const BLOCKED_STATUSES = [
+  "EXPIRED",
+  "PAUSED",
+  "HALTED",
+  "CANCELLED",
+  "COMPLETED",
+];
+
+function isWindowActive(
+  start?: string | null,
+  end?: string | null
+): boolean {
+  if (!end) return false;
+  const now = new Date();
+  if (new Date(end) <= now) return false;
+  if (start && new Date(start) > now) return false;
+  return true;
+}
 
 export function isTrialActive(
   subscription?: Subscription | null
 ): boolean {
-  if (!subscription?.trialEndAt) {
-    return false;
-  }
-
-  return (
-    new Date(subscription.trialEndAt) >
-    new Date()
+  return isWindowActive(
+    subscription?.trialStartAt,
+    subscription?.trialEndAt
   );
 }
 
 export function isSubscriptionActive(
   subscription?: Subscription | null
 ): boolean {
-  if (!subscription?.currentPeriodEnd) {
+  return isWindowActive(
+    subscription?.currentPeriodStart,
+    subscription?.currentPeriodEnd
+  );
+}
+
+/**
+ * Same rule as the backend (backend/src/lib/subscription-access.js).
+ * Only used when the server's `access` field is missing.
+ */
+export function hasPlatformAccess(
+  subscription?: Subscription | null
+): boolean {
+  if (!subscription) return false;
+
+  if (BLOCKED_STATUSES.includes(subscription.status)) {
     return false;
   }
 
   return (
-    new Date(subscription.currentPeriodEnd) >
-    new Date()
+    isTrialActive(subscription) ||
+    isSubscriptionActive(subscription)
   );
-}
-
-export function hasPlatformAccess(
-  subscription?: Subscription | null
-): boolean {
-  if (!subscription) {
-    return false;
-  }
-
-  if (
-    !ACTIVE_STATUSES.includes(
-      subscription.status as
-        (typeof ACTIVE_STATUSES)[number]
-    )
-  ) {
-    return false;
-  }
-
-  switch (subscription.status) {
-    /**
-     * User is in trial period.
-     */
-    case "AUTHENTICATED":
-      return isTrialActive(subscription);
-
-    /**
-     * User has an active paid subscription.
-     */
-    case "ACTIVE":
-      return isSubscriptionActive(subscription);
-
-    default:
-      return false;
-  }
 }
 
 export function getRemainingTrialDays(

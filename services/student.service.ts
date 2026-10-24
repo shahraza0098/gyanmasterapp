@@ -8,5 +8,7 @@ export async function getStudent() {
       "/student/me"
     );
 
-  return response.data.data.user;
+  const { user, access } = response.data.data;
+
+  return { ...user, access: access ?? null };
 }
