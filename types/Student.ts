@@ -43,7 +43,11 @@ export interface Subscription {
 
   cancelledAt?: string | null;
 
-  plan: Plan;
+  provider?: string;
+  revenueCatProductId?: string | null;
+  willRenew?: boolean;
+
+  plan?: Plan | null;
 }
 
 export interface Student {

@@ -45,12 +45,16 @@ import {
   View,
 } from "react-native";
 
+import { useEffect, useState } from "react";
+
 import { useStudent } from "@/hooks/useStudent";
 import { useAppTheme } from "@/providers/ThemeProvider";
 
 import {
   hasPlatformAccess,
 } from "@/lib/subscription";
+
+import { checkPremiumStatus } from "@/lib/revenuecat";
 
 export default function RootLayout() {
   const theme = useAppTheme();
@@ -59,9 +63,32 @@ export default function RootLayout() {
     loading,
   } = useStudent();
 
+  const [rcPremium, setRcPremium] = useState<boolean | null>(null);
 
   console.log("root layout student console: ", student)
   const segments = useSegments();
+
+  // Check RevenueCat entitlement on mount and when student changes
+  useEffect(() => {
+    if (!student || !student.onboardingComplete) {
+      setRcPremium(null);
+      return;
+    }
+
+    let cancelled = false;
+
+    checkPremiumStatus()
+      .then((isPremium) => {
+        if (!cancelled) setRcPremium(isPremium);
+      })
+      .catch(() => {
+        if (!cancelled) setRcPremium(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [student?.id, student?.onboardingComplete]);
 
   if (loading) {
     return (
@@ -99,13 +126,30 @@ export default function RootLayout() {
   }
 
   /**
-   * Subscription
+   * Subscription — RevenueCat is the primary check.
+   * Falls back to the existing backend subscription check.
+   * While RevenueCat is still loading (rcPremium === null),
+   * show a loading indicator to avoid a flash redirect.
    */
-  if (
-    !hasPlatformAccess(
-      student.subscription
-    )
-  ) {
+  if (rcPremium === null) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: theme.background,
+        }}
+      >
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
+  const hasAccess =
+    rcPremium || hasPlatformAccess(student.subscription);
+
+  if (!hasAccess) {
     return (
       <Redirect
         href="/subscription"

@@ -1,7 +1,8 @@
 import { Stack, Redirect, usePathname } from "expo-router";
-import { ClerkProvider, useAuth } from "@clerk/expo";
+import { ClerkProvider, useAuth, useUser } from "@clerk/expo";
 import { tokenCache } from "@clerk/expo/token-cache";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { configureRevenueCat, resetRevenueCat } from "@/lib/revenuecat";
 import "./global.css";
 import * as SplashScreen from "expo-splash-screen";
 import { API_URL } from "../config/api";
@@ -128,9 +129,29 @@ function AppNavigator() {
   const isOnboardingPath =
     pathname.startsWith("/onboarding");
 
+  const { user } = useUser();
+  const rcConfiguredForRef = useRef<string | null>(null);
+
   useEffect(() => {
     setTokenGetter(getToken);
   }, [getToken]);
+
+  // Configure RevenueCat when Clerk user is available
+  useEffect(() => {
+    if (isSignedIn && user?.id && rcConfiguredForRef.current !== user.id) {
+      configureRevenueCat(user.id).catch((err) =>
+        console.warn("[RevenueCat] Config failed:", err)
+      );
+      rcConfiguredForRef.current = user.id;
+    }
+
+    if (!isSignedIn && rcConfiguredForRef.current) {
+      resetRevenueCat().catch((err) =>
+        console.warn("[RevenueCat] Reset failed:", err)
+      );
+      rcConfiguredForRef.current = null;
+    }
+  }, [isSignedIn, user?.id]);
 
   if (!isLoaded || loading) {
     return <SplashScreenController />;

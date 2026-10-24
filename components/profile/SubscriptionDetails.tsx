@@ -29,6 +29,26 @@ export default function SubscriptionDetails({ subscription }: Props) {
 
   const trialActive = isTrialActive(subscription);
   const trialDaysRemaining = getRemainingTrialDays(subscription);
+  
+  const isRevenueCat = subscription.provider === "REVENUECAT";
+  const planName = isRevenueCat 
+    ? "Premium Access (Google Play)" 
+    : (subscription.plan?.name || "Subscription Plan");
+
+  let subtitleText = "";
+  if (isRevenueCat) {
+    if (trialActive) {
+      subtitleText = `Trial active • Ends ${formatDate(subscription.trialEndAt)}`;
+    } else {
+      subtitleText = subscription.willRenew 
+        ? `Active • Next billing ${formatDate(subscription.nextChargeAt ?? subscription.currentPeriodEnd)}`
+        : `Cancels at ${formatDate(subscription.currentPeriodEnd)}`;
+    }
+  } else {
+    subtitleText = trialActive
+      ? `${trialDaysRemaining} ${trialDaysRemaining === 1 ? "day" : "days"} left in trial • Ends ${formatDate(subscription.trialEndAt)}`
+      : `Active • Next billing ${formatDate(subscription.nextChargeAt ?? subscription.currentPeriodEnd)}`;
+  }
 
   return (
     <View style={styles.menuRow}>
@@ -38,12 +58,10 @@ export default function SubscriptionDetails({ subscription }: Props) {
 
       <View style={styles.textWrap}>
         <Text style={[styles.title, { color: theme.text }]}>
-          {subscription.plan.name || "Subscription Plan"}
+          {planName}
         </Text>
         <Text style={[styles.subtitle, { color: theme.textMuted }]}>
-          {trialActive
-            ? `${trialDaysRemaining} ${trialDaysRemaining === 1 ? "day" : "days"} left in trial • Ends ${formatDate(subscription.trialEndAt)}`
-            : `Active • Next billing ${formatDate(subscription.nextChargeAt ?? subscription.currentPeriodEnd)}`}
+          {subtitleText}
         </Text>
       </View>
 

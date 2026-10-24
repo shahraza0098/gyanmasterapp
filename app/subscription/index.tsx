@@ -1044,9 +1044,10 @@
 
 
 
-//claude design
 
-import React, { useState, useCallback } from "react";
+//claude design — migrated from Razorpay to RevenueCat
+
+import React, { useState, useCallback, useEffect } from "react";
 import {
   View,
   Text,
@@ -1054,20 +1055,27 @@ import {
   ActivityIndicator,
   ScrollView,
   Platform,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
-import RazorpayCheckout from "react-native-razorpay";
+// RazorpayCheckout import kept but no longer called:
+// import RazorpayCheckout from "react-native-razorpay";
 import { router } from "expo-router";
 import { useClerk } from "@clerk/expo";
 
 import { useStudentContext } from "@/providers/StudentProvider";
-import { useSubscription } from "@/hooks/useSubscription";
-import { verifySubscription } from "@/services/subscription.service";
+import {
+  purchaseMonthlyPackage,
+  restorePurchases,
+  getMonthlyPackage,
+  checkPremiumStatus,
+  type PurchaseResult,
+} from "@/lib/revenuecat";
+import type { PurchasesPackage } from "react-native-purchases";
 
 // ── Design tokens ────────────────────────────────────────────────
-// Kept for passing direct hex values to icon 'color' props 
-// and the Razorpay theme config.
+// Kept for passing direct hex values to icon 'color' props.
 const COLORS = {
   bg: "#09090E",
   surface: "#12121A",
@@ -1081,30 +1089,63 @@ const COLORS = {
   danger: "#E5636B",
 };
 
+// Fallback plan info (used if Google Play product info is unavailable)
 const PLAN = {
-  trialAmount: 1,
-  trialDays: 1,
+  introPrice: "₹4",
+  introDays: 3,
+  monthlyPrice: "₹499",
   monthlyAmount: 499,
 };
 
 type Status =
   | "idle"
-  | "starting"
-  | "checkout"
-  | "verifying"
+  | "loading_package"
+  | "purchasing"
+  | "restoring"
   | "success"
   | "already_active"
   | "error";
 
 export default function SubscriptionScreen() {
-  const { create, error: createError } = useSubscription();
   const [status, setStatus] = useState<Status>("idle");
   const [message, setMessage] = useState<string | null>(null);
+  const [monthlyPkg, setMonthlyPkg] = useState<PurchasesPackage | null>(null);
 
-  const { student, loading, refreshStudent, setStudent } = useStudentContext();
+  const { student, refreshStudent } = useStudentContext();
   const { signOut } = useClerk();
+
   const busy =
-    status === "starting" || status === "checkout" || status === "verifying";
+    status === "loading_package" ||
+    status === "purchasing" ||
+    status === "restoring";
+
+  // Load the monthly package from RevenueCat on mount
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadPackage() {
+      try {
+        const pkg = await getMonthlyPackage();
+        if (!cancelled) setMonthlyPkg(pkg);
+      } catch (err) {
+        console.warn("[Subscription] Failed to load package:", err);
+      }
+    }
+
+    loadPackage();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Derive display prices from RevenueCat product or fallback
+  const product = monthlyPkg?.product;
+  const displayMonthlyPrice = product?.priceString ?? PLAN.monthlyPrice;
+  const introPhase = product?.introPrice;
+  const displayIntroPrice = introPhase?.priceString ?? PLAN.introPrice;
+  const displayIntroDays = introPhase
+    ? `${introPhase.periodNumberOfUnits} ${introPhase.periodUnit === "DAY" ? (introPhase.periodNumberOfUnits === 1 ? "day" : "days") : introPhase.periodUnit.toLowerCase()}`
+    : `${PLAN.introDays} days`;
 
   const handleNavAfterSubs = () => {
     refreshStudent();
@@ -1112,84 +1153,65 @@ export default function SubscriptionScreen() {
   };
 
   const handleSubscribe = useCallback(async () => {
-    setMessage(null);
-    setStatus("starting");
+    if (busy) return;
 
-    const data = await create("plan_TDrSWzkFhQEprY");
-    console.log("subscription created data:", data);
-    if (!data) {
-      if (createError?.startsWith("ALREADY_SUBSCRIBED")) {
-        setStatus("already_active");
-      } else {
-        setStatus("error");
-        setMessage(createError ?? "Couldn't start your trial. Try again.");
-      }
+    setMessage(null);
+    setStatus("purchasing");
+
+    const result: PurchaseResult = await purchaseMonthlyPackage();
+
+    if (result.cancelled) {
+      // User cancelled — just go back to idle
+      setStatus("idle");
       return;
     }
 
-    setStatus("checkout");
-    try {
-      const key = data.keyId ?? data.key;
-      const trialAmount =
-        data.trialAmount ?? data.plan?.trialAmount ?? PLAN.trialAmount;
-      const monthlyAmount =
-        data.monthlyAmount ?? data.plan?.price ?? PLAN.monthlyAmount;
-
-      if (!key || !data.subscriptionId) {
-        throw new Error("Missing Razorpay checkout details from server.");
-      }
-      console.log("Opening Razorpay");
-
-      const result = await RazorpayCheckout.open({
-        key,
-        subscription_id: data.subscriptionId,
-        name: "Premium",
-        description: `₹${trialAmount} today, then ₹${monthlyAmount}/mo`,
-        theme: { color: COLORS.accent },
-        prefill: {
-          email: student?.email,
-          contact: student?.phone,
-          name: student?.name,
-        },
-      });
-
-      console.log("result coming: ", result);
-      setStatus("verifying");
-
-      console.log("Calling verify API");
-      const verified = await verifySubscription({
-        razorpay_payment_id: result.razorpay_payment_id,
-        razorpay_subscription_id: result.razorpay_subscription_id,
-        razorpay_signature: result.razorpay_signature,
-      });
-
-      console.log("Verify response", verified);
-
-      if (verified?.ok) {
-        setStatus("success");
-      } else {
-        setStatus("error");
-        setMessage(
-          "Payment went through but couldn't be verified. Contact support."
-        );
-      }
-    } catch (error) {
-      console.log("Checkout error", error);
-      const checkoutMessage =
-        error instanceof Error
-          ? error.message
-          : "Razorpay checkout was cancelled.";
-
-      const normalizedMessage = checkoutMessage.toLowerCase();
-      const userCancelled =
-        normalizedMessage.includes("cancel") ||
-        normalizedMessage.includes("dismiss") ||
-        normalizedMessage.includes("closed");
-
-      setStatus(userCancelled ? "idle" : "error");
-      setMessage(userCancelled ? null : checkoutMessage);
+    if (result.success && result.isPremium) {
+      setStatus("success");
+      return;
     }
-  }, [create, createError]);
+
+    if (result.success && !result.isPremium) {
+      // Purchase succeeded but entitlement not yet active
+      // (can happen during processing)
+      setStatus("error");
+      setMessage(
+        "Purchase completed but your premium access is being processed. Please restart the app."
+      );
+      return;
+    }
+
+    // Error case
+    setStatus("error");
+    setMessage(
+      result.errorMessage ?? "Something went wrong. Please try again."
+    );
+  }, [busy]);
+
+  const handleRestore = useCallback(async () => {
+    if (busy) return;
+
+    setMessage(null);
+    setStatus("restoring");
+
+    const result = await restorePurchases();
+
+    if (result.isPremium) {
+      setStatus("success");
+      return;
+    }
+
+    if (result.success && !result.isPremium) {
+      setStatus("idle");
+      setMessage("No active subscription found. Subscribe to get premium access.");
+      return;
+    }
+
+    setStatus("error");
+    setMessage(
+      result.errorMessage ?? "Could not restore purchases. Try again later."
+    );
+  }, [busy]);
 
   if (status === "success") {
     return <SuccessState onDone={handleNavAfterSubs} />;
@@ -1203,13 +1225,6 @@ export default function SubscriptionScreen() {
           showsVerticalScrollIndicator={false}
         >
           <View className="flex-row items-center justify-between mb-4">
-            {/* <Pressable
-              onPress={() => router.back()}
-              hitSlop={12}
-              className="w-9 h-9 rounded-full bg-transparent items-center justify-center -ml-2"
-            >
-              <Feather name="x" size={20} color={COLORS.text} />
-            </Pressable> */}
             <Pressable
               onPress={() => signOut()}
               className="w-10 h-10 rounded-full bg-[#E5636B] items-center justify-center"
@@ -1227,16 +1242,16 @@ export default function SubscriptionScreen() {
             Every course.{"\n"}One membership.
           </Text>
           <Text className="text-[#9CA3AF] text-[15px] leading-[22px] mb-8">
-            Try it for {PLAN.trialDays} days for just ₹{PLAN.trialAmount}.{"\n"}
+            Try it for {displayIntroDays} for just {displayIntroPrice}.{"\n"}
             Cancel anytime before it renews.
           </Text>
 
-          <TrialTimeline />
+          <TrialTimeline introPrice={displayIntroPrice} introDays={displayIntroDays} />
 
           {/* Pricing Card Section */}
           <View className="bg-[#12121A] rounded-2xl border border-[#2A2A38] py-7 px-5 items-center mb-4">
             <Text className="text-[#9CA3AF] text-[15px] mb-2">
-              {PLAN.trialDays}-day trial
+              Introductory offer
             </Text>
 
             <View className="flex-row items-center gap-4 my-1">
@@ -1250,7 +1265,7 @@ export default function SubscriptionScreen() {
                 className="text-white text-[72px] font-bold"
                 style={{ includeFontPadding: false }}
               >
-                ₹{PLAN.trialAmount}
+                {displayIntroPrice}
               </Text>
               <Feather
                 name="minimize-2"
@@ -1259,6 +1274,10 @@ export default function SubscriptionScreen() {
                 style={{ transform: [{ rotate: "-135deg" }] }}
               />
             </View>
+
+            <Text className="text-[#9CA3AF] text-xs mt-1 mb-4">
+              for {displayIntroDays}
+            </Text>
 
             <View className="w-full relative items-center justify-center my-6">
               <View className="w-full h-[1px] bg-[#2A2A38]" />
@@ -1269,10 +1288,10 @@ export default function SubscriptionScreen() {
 
             <Text className="text-[#9CA3AF] text-[15px] mb-2">Then</Text>
             <Text className="text-white text-base font-bold mb-[6px]">
-              ₹{PLAN.monthlyAmount}/month
+              {displayMonthlyPrice}/month
             </Text>
             <Text className="text-[#9CA3AF] text-xs">
-              Billed automatically after trial ends
+              Billed automatically · Auto-renews monthly
             </Text>
           </View>
 
@@ -1280,7 +1299,7 @@ export default function SubscriptionScreen() {
           <View className="bg-[#12121A] rounded-xl border border-[#2A2A38] p-5 mb-5 gap-3">
             <Feature text="Unlimited access to every course" />
             <Feature text="Certificates on completion" />
-            <Feature text="Cancel from Settings, anytime" />
+            <Feature text="Manage or cancel via Google Play" />
           </View>
 
           {status === "already_active" && (
@@ -1296,32 +1315,57 @@ export default function SubscriptionScreen() {
             <Banner tone="danger" text={message} />
           )}
 
+          {/* Idle message (e.g. after restore with no subscription) */}
+          {status === "idle" && message && (
+            <Banner tone="info" text={message} />
+          )}
+
           {status !== "already_active" && (
             <Pressable
               onPress={handleSubscribe}
               disabled={busy}
-              className={`bg-[#FFDE4E] rounded-lg py-4 items-center justify-center mb-5 mt-2 active:opacity-85 ${busy ? "opacity-60" : "opacity-100"
-                }`}
+              className={`bg-[#FFDE4E] rounded-lg py-4 items-center justify-center mb-3 mt-2 active:opacity-85 ${
+                busy ? "opacity-60" : "opacity-100"
+              }`}
             >
-              {busy ? (
+              {busy && status === "purchasing" ? (
                 <ActivityIndicator color={COLORS.bg} />
               ) : (
                 <Text className="text-[#09090E] text-base font-bold">
-                  Start {PLAN.trialDays}-day trial
+                  Subscribe — {displayIntroPrice} for {displayIntroDays}
                 </Text>
               )}
             </Pressable>
           )}
 
-          {/* Terms Section mapped exactly to layout */}
+          {/* Restore purchases */}
+          <Pressable
+            onPress={handleRestore}
+            disabled={busy}
+            className={`py-3 items-center justify-center mb-5 ${
+              busy ? "opacity-40" : "opacity-100"
+            }`}
+          >
+            {busy && status === "restoring" ? (
+              <ActivityIndicator color={COLORS.textMuted} />
+            ) : (
+              <Text className="text-[#9CA3AF] text-sm underline">
+                Restore purchases
+              </Text>
+            )}
+          </Pressable>
+
+          {/* Terms Section */}
           <View className="mt-2">
             <Text className="text-[#FFC72C] text-[15px] font-bold mb-[6px]">
               How it works
             </Text>
             <Text className="text-[#9CA3AF] text-[13px] leading-[18px]">
-              By continuing you authorize a recurring mandate of ₹
-              {PLAN.monthlyAmount}/month via Razorpay, charged automatically
-              after your trial ends unless you cancel first.
+              Your subscription is processed through Google Play.
+              {"\n\n"}• {displayIntroPrice} introductory offer for {displayIntroDays}
+              {"\n"}• Then {displayMonthlyPrice}/month, auto-renewing
+              {"\n"}• Cancel anytime from Google Play subscriptions
+              {"\n\n"}Payment is charged to your Google Play account.
             </Text>
           </View>
         </ScrollView>
@@ -1331,18 +1375,31 @@ export default function SubscriptionScreen() {
 }
 
 // ── Redesigned Signature Elements ────────────────────────────────
-function TrialTimeline() {
+function TrialTimeline({
+  introPrice,
+  introDays,
+}: {
+  introPrice: string;
+  introDays: string;
+}) {
   return (
     <View className="flex-row justify-between items-center mb-6 px-5 relative">
-      {/* Absolute line connector traversing across */}
       <View className="absolute top-[5px] left-10 right-10 h-[1px] bg-[#2A2A38] z-0" />
 
-      {Array.from({ length: PLAN.trialDays }).map((_, i) => (
-        <View key={i} className="items-center z-10 bg-[#09090E]">
-          <View className="w-[10px] h-[10px] rounded-[5px] bg-[#FFC72C] mb-2" />
-          <Text className="text-[#9CA3AF] text-[13px]">Day {i + 1}</Text>
-        </View>
-      ))}
+      <View className="items-center z-10 bg-[#09090E]">
+        <View className="w-[10px] h-[10px] rounded-[5px] bg-[#FFC72C] mb-2" />
+        <Text className="text-[#9CA3AF] text-[13px]">Today</Text>
+      </View>
+
+      <View className="items-center z-10 bg-[#09090E] px-2">
+        <View className="w-[10px] h-[10px] rounded-[5px] bg-[#FFC72C] mb-2" />
+        <Text className="text-[#9CA3AF] text-[13px]">{introDays}</Text>
+      </View>
+
+      <View className="items-center z-10 bg-[#09090E]">
+        <View className="w-[10px] h-[10px] rounded-[5px] bg-[#9CA3AF] mb-2" />
+        <Text className="text-[#9CA3AF] text-[13px]">Monthly</Text>
+      </View>
     </View>
   );
 }
@@ -1372,8 +1429,9 @@ function Banner({
 
   return (
     <View
-      className={`flex-row items-center gap-2 border rounded-lg p-4 mb-6 ${isDanger ? "border-[#E5636B]" : "border-[#FFC72C]"
-        }`}
+      className={`flex-row items-center gap-2 border rounded-lg p-4 mb-6 ${
+        isDanger ? "border-[#E5636B]" : "border-[#FFC72C]"
+      }`}
     >
       <Feather
         name={isDanger ? "alert-circle" : "info"}
@@ -1384,8 +1442,9 @@ function Banner({
       {action && (
         <Pressable onPress={onPress}>
           <Text
-            className={`text-sm font-semibold ${isDanger ? "text-[#E5636B]" : "text-[#FFC72C]"
-              }`}
+            className={`text-sm font-semibold ${
+              isDanger ? "text-[#E5636B]" : "text-[#FFC72C]"
+            }`}
           >
             {action} &gt;
           </Text>
@@ -1402,10 +1461,10 @@ function SuccessState({ onDone }: { onDone: () => void }) {
         <View className="w-16 h-16 rounded-full bg-[#3ECF8E] items-center justify-center mb-5">
           <Feather name="check" size={28} color={COLORS.bg} />
         </View>
-        <Text className="text-white text-2xl font-bold mb-2">You&apos;re in</Text>
+        <Text className="text-white text-2xl font-bold mb-2">You&apos;re in!</Text>
         <Text className="text-[#9CA3AF] text-sm text-center leading-5 mb-8">
-          Your {PLAN.trialDays}-day trial has started. We&apos;ll remind you
-          before the first ₹{PLAN.monthlyAmount} charge.
+          Your GyanMaster Premium subscription is now active.
+          Enjoy unlimited access to every course!
         </Text>
         <Pressable
           onPress={onDone}
@@ -1416,4 +1475,4 @@ function SuccessState({ onDone }: { onDone: () => void }) {
       </SafeAreaView>
     </View>
   );
-}
+}

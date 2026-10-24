@@ -450,7 +450,7 @@ export default function CourseScreen() {
     refreshing,
     refresh,
     error,
-  } = useCourse(id);
+  } = useCourse(typeof id === "string" ? id : id[0]);
 
   const lessonCount = useMemo(() => {
     if (!course) return 0;
