@@ -2,7 +2,7 @@
 
 //gemini UI
 
-import React from "react";
+import React, { useCallback, useRef } from "react";
 import {
   RefreshControl, 
   ScrollView,
@@ -23,6 +23,7 @@ import LessonNavigation from "@/components/lesson/LessonNavigation";
 import ErrorState from "@/components/ErrorState";
 import LoadingState from "@/components/LoadingState";
 import { useAppTheme } from "@/providers/ThemeProvider";
+import { logLessonStarted } from "@/lib/meta-events";
 
 export default function LessonScreen() {
   const theme = useAppTheme();
@@ -39,7 +40,26 @@ export default function LessonScreen() {
     lessonId: lesson?.id ?? "",
     duration: lesson?.duration ?? 0,
     initialWatchedSeconds: lesson?.watchedSeconds ?? 0,
+    courseId: lesson?.course?.id,
+    initiallyCompleted: lesson?.completed ?? false,
   });
+
+  /**
+   * Meta LessonStarted — first real playback of this lesson on this
+   * screen. Pause/resume and re-renders don't re-log.
+   */
+  const startLoggedForRef = useRef<string | null>(null);
+  const loadedLessonId = lesson?.id;
+  const loadedCourseId = lesson?.course?.id;
+
+  const handlePlaybackStart = useCallback(() => {
+    if (!loadedLessonId || startLoggedForRef.current === loadedLessonId) {
+      return;
+    }
+
+    startLoggedForRef.current = loadedLessonId;
+    logLessonStarted({ lessonId: loadedLessonId, courseId: loadedCourseId });
+  }, [loadedLessonId, loadedCourseId]);
 
   /**
    * Loading State
@@ -93,6 +113,7 @@ export default function LessonScreen() {
             watchedSeconds={player.watchedSeconds}
             onTimeUpdate={player.onTimeUpdate}
             onEnded={player.onEnded}
+            onPlaybackStart={handlePlaybackStart}
           />
           <View style={[styles.progressWrapper, { borderTopColor: theme.border }]}>
             <LessonProgress

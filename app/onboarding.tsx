@@ -19,6 +19,7 @@ import { API_URL } from "../config/api";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAppTheme } from "@/providers/ThemeProvider";
 import { getErrorMessage } from "@/utils/errorMessages";
+import { logCompleteRegistration } from "@/lib/meta-events";
 
 export default function OnboardingScreen() {
   const theme = useAppTheme();
@@ -84,6 +85,9 @@ export default function OnboardingScreen() {
         const rawMsg = data?.message || data?.error || "Unable to save profile";
         throw new Error(rawMsg);
       }
+
+      // Profile saved: the account is now fully registered.
+      logCompleteRegistration();
 
       router.replace("/(root)/(tabs)");
     } catch (error) {

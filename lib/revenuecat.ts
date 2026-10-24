@@ -72,6 +72,7 @@ export async function resetRevenueCat(): Promise<void> {
   }
 
   isConfigured = false;
+  attributionSetup = null;
 }
 
 /**
@@ -83,6 +84,71 @@ export async function loginRevenueCat(
 ): Promise<CustomerInfo> {
   const { customerInfo } = await Purchases.logIn(clerkUserId);
   return customerInfo;
+}
+
+// ── Attribution ────────────────────────────────────────────────────
+
+// Max time a purchase waits for attribution setup before going ahead.
+const ATTRIBUTION_WAIT_MS = 3000;
+
+let attributionSetup: Promise<void> | null = null;
+
+/**
+ * Set the subscriber attributes RevenueCat's Meta Ads (Conversions API)
+ * integration needs to match subscription events to this install:
+ * - device identifiers ($gpsAdId, $androidId, $ip, …) via
+ *   Purchases.collectDeviceIdentifiers()
+ * - the Meta SDK anonymous ID ($fbAnonId) via Purchases.setFBAnonymousID()
+ *
+ * Runs once per configure; later calls return the same promise.
+ * Never rejects — attribution is optional and must not block the app.
+ * Identifier values are never logged.
+ */
+export function setupRevenueCatAttribution(
+  getMetaAnonymousId: () => Promise<string | null>
+): Promise<void> {
+  if (!isConfigured) return Promise.resolve();
+
+  if (!attributionSetup) {
+    attributionSetup = (async () => {
+      try {
+        await Purchases.collectDeviceIdentifiers();
+      } catch {
+        console.warn("[RevenueCat] Could not collect device identifiers");
+      }
+
+      try {
+        const anonymousId = (await getMetaAnonymousId())?.trim();
+        if (anonymousId) {
+          await Purchases.setFBAnonymousID(anonymousId);
+        } else if (__DEV__) {
+          console.log("[RevenueCat] Meta anonymous ID unavailable; skipped");
+        }
+      } catch {
+        console.warn("[RevenueCat] Could not set Meta anonymous ID");
+      }
+    })();
+  }
+
+  return attributionSetup;
+}
+
+/**
+ * Give in-flight attribution setup a short head start so the first
+ * purchase carries the identifiers. Bounded, so a slow or failing
+ * native call never holds up checkout.
+ */
+async function waitForAttributionSetup(): Promise<void> {
+  if (!attributionSetup) return;
+
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  await Promise.race([
+    attributionSetup,
+    new Promise<void>((resolve) => {
+      timer = setTimeout(resolve, ATTRIBUTION_WAIT_MS);
+    }),
+  ]);
+  clearTimeout(timer);
 }
 
 // ── Customer info ──────────────────────────────────────────────────
@@ -160,6 +226,8 @@ export async function purchaseMonthlyPackage(): Promise<PurchaseResult> {
           "Monthly subscription is currently unavailable. Please try again later.",
       };
     }
+
+    await waitForAttributionSetup();
 
     const { customerInfo } =
       await Purchases.purchasePackage(monthly);

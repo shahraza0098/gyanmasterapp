@@ -200,6 +200,8 @@ interface VideoPlayerProps {
   watchedSeconds: number;
   onTimeUpdate: (seconds: number) => void;
   onEnded: () => void;
+  /** Fired whenever playback starts or resumes. */
+  onPlaybackStart?: () => void;
 }
 
 export default function VideoPlayer({
@@ -207,6 +209,7 @@ export default function VideoPlayer({
   watchedSeconds,
   onTimeUpdate,
   onEnded,
+  onPlaybackStart,
 }: VideoPlayerProps) {
   /**
    * Bunny HLS Player
@@ -246,6 +249,15 @@ export default function VideoPlayer({
    */
   useEventListener(player, "timeUpdate", ({ currentTime }) => {
     onTimeUpdate(currentTime);
+  });
+
+  /**
+   * Playback started / resumed
+   */
+  useEventListener(player, "playingChange", ({ isPlaying }) => {
+    if (isPlaying) {
+      onPlaybackStart?.();
+    }
   });
 
   /**

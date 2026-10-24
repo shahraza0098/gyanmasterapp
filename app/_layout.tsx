@@ -2,7 +2,13 @@ import { Stack, Redirect, usePathname } from "expo-router";
 import { ClerkProvider, useAuth, useUser } from "@clerk/expo";
 import { tokenCache } from "@clerk/expo/token-cache";
 import { useEffect, useRef, useState } from "react";
-import { configureRevenueCat, resetRevenueCat } from "@/lib/revenuecat";
+import {
+  configureRevenueCat,
+  resetRevenueCat,
+  setupRevenueCatAttribution,
+} from "@/lib/revenuecat";
+import { getMetaAnonymousId } from "@/lib/meta-events";
+import { useMetaLoginTracking } from "@/hooks/useMetaLoginTracking";
 import "./global.css";
 import * as SplashScreen from "expo-splash-screen";
 import { API_URL } from "../config/api";
@@ -132,6 +138,9 @@ function AppNavigator() {
   const { user } = useUser();
   const rcConfiguredForRef = useRef<string | null>(null);
 
+  // Meta "Login" event on interactive sign-in (AuthView has no callback).
+  useMetaLoginTracking();
+
   useEffect(() => {
     setTokenGetter(getToken);
   }, [getToken]);
@@ -139,9 +148,13 @@ function AppNavigator() {
   // Configure RevenueCat when Clerk user is available
   useEffect(() => {
     if (isSignedIn && user?.id && rcConfiguredForRef.current !== user.id) {
-      configureRevenueCat(user.id).catch((err) =>
-        console.warn("[RevenueCat] Config failed:", err)
-      );
+      configureRevenueCat(user.id)
+        // Attribution for RevenueCat's Meta Ads integration (device IDs +
+        // Meta anonymous ID). Never rejects; purchases wait for it briefly.
+        .then(() => setupRevenueCatAttribution(getMetaAnonymousId))
+        .catch((err) =>
+          console.warn("[RevenueCat] Config failed:", err)
+        );
       rcConfiguredForRef.current = user.id;
     }
 

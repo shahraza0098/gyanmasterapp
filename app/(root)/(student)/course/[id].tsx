@@ -421,7 +421,7 @@
 //gemini UI
 
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import {
   RefreshControl,
   ScrollView,
@@ -439,6 +439,7 @@ import SectionAccordion from "@/components/course/SectionAccordion";
 import ErrorState from "@/components/ErrorState";
 import LoadingState from "@/components/LoadingState";
 import { useAppTheme } from "@/providers/ThemeProvider";
+import { logViewCourse } from "@/lib/meta-events";
 
 export default function CourseScreen() {
   const theme = useAppTheme();
@@ -451,6 +452,22 @@ export default function CourseScreen() {
     refresh,
     error,
   } = useCourse(typeof id === "string" ? id : id[0]);
+
+  /**
+   * Meta ViewContent — once per course per screen instance, after the
+   * course has loaded. Re-renders and pull-to-refresh don't re-log.
+   */
+  const viewLoggedForRef = useRef<string | null>(null);
+  const courseId = course?.id;
+  const categoryId = course?.category?.id;
+  const courseLevel = course?.level;
+
+  useEffect(() => {
+    if (!courseId || viewLoggedForRef.current === courseId) return;
+
+    viewLoggedForRef.current = courseId;
+    logViewCourse({ courseId, categoryId, level: courseLevel });
+  }, [courseId, categoryId, courseLevel]);
 
   const lessonCount = useMemo(() => {
     if (!course) return 0;

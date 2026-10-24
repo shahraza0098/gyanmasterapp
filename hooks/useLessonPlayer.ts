@@ -2,11 +2,16 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { AppState, AppStateStatus } from "react-native";
 
 import LessonService from "@/services/lesson.service";
+import { logLessonCompleted } from "@/lib/meta-events";
 
 interface UseLessonPlayerParams {
   lessonId: string;
   duration: number;
   initialWatchedSeconds: number;
+  /** Used only for analytics parameters. */
+  courseId?: string;
+  /** Lesson was already completed before this session. */
+  initiallyCompleted?: boolean;
 }
 
 interface UseLessonPlayerReturn {
@@ -29,6 +34,8 @@ export function useLessonPlayer({
   lessonId,
   duration,
   initialWatchedSeconds,
+  courseId,
+  initiallyCompleted = false,
 }: UseLessonPlayerParams): UseLessonPlayerReturn {
   /**
    * UI state
@@ -47,6 +54,17 @@ export function useLessonPlayer({
 
   const saving =
     useRef(false);
+
+  /**
+   * Meta LessonCompleted is logged once, when the backend first reports
+   * this lesson as completed.
+   */
+  const completionLogged =
+    useRef(initiallyCompleted);
+
+  useEffect(() => {
+    completionLogged.current = initiallyCompleted;
+  }, [lessonId, initiallyCompleted]);
 
   /**
    * Reset when lesson changes
@@ -74,13 +92,22 @@ export function useLessonPlayer({
         saving.current = true;
 
         try {
-          await LessonService.updateProgress(
-            lessonId,
-            seconds
-          );
+          const result =
+            await LessonService.updateProgress(
+              lessonId,
+              seconds
+            );
 
           lastSavedPosition.current =
             seconds;
+
+          if (
+            result?.completed &&
+            !completionLogged.current
+          ) {
+            completionLogged.current = true;
+            logLessonCompleted({ lessonId, courseId });
+          }
         } catch (error) {
           console.log(
             "Failed to save lesson progress",
@@ -90,7 +117,7 @@ export function useLessonPlayer({
           saving.current = false;
         }
       },
-      [lessonId]
+      [lessonId, courseId]
     );
 
   /**

@@ -1073,6 +1073,7 @@ import {
   type PurchaseResult,
 } from "@/lib/revenuecat";
 import type { PurchasesPackage } from "react-native-purchases";
+import { logInitiateCheckout } from "@/lib/meta-events";
 
 // ── Design tokens ────────────────────────────────────────────────
 // Kept for passing direct hex values to icon 'color' props.
@@ -1158,6 +1159,17 @@ export default function SubscriptionScreen() {
     setMessage(null);
     setStatus("purchasing");
 
+    // Meta InitiateCheckout — only when a purchasable product is loaded,
+    // i.e. this tap actually opens Google Play checkout. Trial/subscribe
+    // outcomes are sent to Meta by RevenueCat, not from the app.
+    if (monthlyPkg) {
+      logInitiateCheckout({
+        productId: monthlyPkg.product.identifier,
+        price: monthlyPkg.product.price,
+        currency: monthlyPkg.product.currencyCode,
+      });
+    }
+
     const result: PurchaseResult = await purchaseMonthlyPackage();
 
     if (result.cancelled) {
@@ -1186,7 +1198,7 @@ export default function SubscriptionScreen() {
     setMessage(
       result.errorMessage ?? "Something went wrong. Please try again."
     );
-  }, [busy]);
+  }, [busy, monthlyPkg]);
 
   const handleRestore = useCallback(async () => {
     if (busy) return;
