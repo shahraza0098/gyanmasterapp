@@ -20,19 +20,21 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useAppTheme } from "@/providers/ThemeProvider";
 import { getErrorMessage } from "@/utils/errorMessages";
 import { logCompleteRegistration } from "@/lib/meta-events";
+import { useStudentContext } from "@/providers/StudentProvider";
+
+/** Accounts that already sent Meta CompleteRegistration in this app session. */
+const registrationLoggedFor = new Set<string>();
 
 export default function OnboardingScreen() {
   const theme = useAppTheme();
-  const { getToken } = useAuth();
+  const { getToken, userId } = useAuth();
   const { signOut } = useClerk();
+  const { refreshStudent } = useStudentContext();
   const [name, setName] = useState("");
 
   const [phone, setPhone] = useState("");
 
   const [loading, setLoading] = useState(false);
-
-  console.log("API_URL:", API_URL);
-  console.log("name:", name);
 
   const handleContinue = async () => {
     const trimmedName = name.trim();
@@ -62,8 +64,6 @@ export default function OnboardingScreen() {
         return;
       }
 
-      console.log("Token:", token);
-
       const response = await fetch(`${API_URL}/api/student/onboard`, {
         method: "POST",
         headers: {
@@ -77,9 +77,6 @@ export default function OnboardingScreen() {
       });
 
       const data = await response.json();
-      console.log("Response data:", data);
-
-      console.log("Status:", response.status);
 
       if (!response.ok) {
         const rawMsg = data?.message || data?.error || "Unable to save profile";
@@ -87,7 +84,15 @@ export default function OnboardingScreen() {
       }
 
       // Profile saved: the account is now fully registered.
-      logCompleteRegistration();
+      // Logged once per account, even if onboarding is submitted again.
+      if (userId && !registrationLoggedFor.has(userId)) {
+        registrationLoggedFor.add(userId);
+        logCompleteRegistration();
+      }
+
+      // Reload the student so the root layout sees the new profile;
+      // otherwise it sends the user straight back to onboarding.
+      await refreshStudent();
 
       router.replace("/(root)/(tabs)");
     } catch (error) {

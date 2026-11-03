@@ -1047,7 +1047,7 @@
 
 //claude design — migrated from Razorpay to RevenueCat
 
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -1069,6 +1069,7 @@ import {
   purchaseMonthlyPackage,
   restorePurchases,
   getMonthlyPackage,
+  getTrialSubscriptionOption,
   checkPremiumStatus,
   type PurchaseResult,
 } from "@/lib/revenuecat";
@@ -1139,13 +1140,37 @@ export default function SubscriptionScreen() {
     };
   }, []);
 
-  // Derive display prices from RevenueCat product or fallback
+  // Derive display prices from RevenueCat product, specific trial option, or fallback
   const product = monthlyPkg?.product;
-  const displayMonthlyPrice = product?.priceString ?? PLAN.monthlyPrice;
-  const introPhase = product?.introPrice;
-  const displayIntroPrice = introPhase?.priceString ?? PLAN.introPrice;
-  const displayIntroDays = introPhase
-    ? `${introPhase.periodNumberOfUnits} ${introPhase.periodUnit === "DAY" ? (introPhase.periodNumberOfUnits === 1 ? "day" : "days") : introPhase.periodUnit.toLowerCase()}`
+  const trialOption = monthlyPkg ? getTrialSubscriptionOption(monthlyPkg) : null;
+  const activeIntroPhase = trialOption?.introPhase ?? trialOption?.freePhase;
+
+  const displayMonthlyPrice =
+    trialOption?.fullPricePhase?.price?.formatted ??
+    product?.priceString ??
+    PLAN.monthlyPrice;
+
+  const displayIntroPrice =
+    activeIntroPhase?.price?.formatted ??
+    product?.introPrice?.priceString ??
+    PLAN.introPrice;
+
+  const displayIntroDays = activeIntroPhase?.billingPeriod
+    ? `${activeIntroPhase.billingPeriod.value} ${
+        activeIntroPhase.billingPeriod.unit === "DAY"
+          ? activeIntroPhase.billingPeriod.value === 1
+            ? "day"
+            : "days"
+          : activeIntroPhase.billingPeriod.unit.toLowerCase()
+      }`
+    : product?.introPrice
+    ? `${product.introPrice.periodNumberOfUnits} ${
+        product.introPrice.periodUnit === "DAY"
+          ? product.introPrice.periodNumberOfUnits === 1
+            ? "day"
+            : "days"
+          : product.introPrice.periodUnit.toLowerCase()
+      }`
     : `${PLAN.introDays} days`;
 
   const handleNavAfterSubs = () => {
@@ -1153,9 +1178,11 @@ export default function SubscriptionScreen() {
     router.replace("/courses");
   };
 
-  const handleSubscribe = useCallback(async () => {
-    if (busy) return;
+  // Blocks a second tap before the "purchasing" state has re-rendered,
+  // so one checkout can't log InitiateCheckout or start Google Play twice.
+  const purchaseInFlight = useRef(false);
 
+  const runSubscribe = async () => {
     setMessage(null);
     setStatus("purchasing");
 
@@ -1163,10 +1190,16 @@ export default function SubscriptionScreen() {
     // i.e. this tap actually opens Google Play checkout. Trial/subscribe
     // outcomes are sent to Meta by RevenueCat, not from the app.
     if (monthlyPkg) {
+      const trialPrice = activeIntroPhase
+        ? activeIntroPhase.price.amountMicros / 1000000
+        : monthlyPkg.product.price;
+
       logInitiateCheckout({
         productId: monthlyPkg.product.identifier,
-        price: monthlyPkg.product.price,
-        currency: monthlyPkg.product.currencyCode,
+        price: trialPrice,
+        currency:
+          activeIntroPhase?.price?.currencyCode ??
+          monthlyPkg.product.currencyCode,
       });
     }
 
@@ -1198,7 +1231,18 @@ export default function SubscriptionScreen() {
     setMessage(
       result.errorMessage ?? "Something went wrong. Please try again."
     );
-  }, [busy, monthlyPkg]);
+  };
+
+  const handleSubscribe = async () => {
+    if (busy || purchaseInFlight.current) return;
+    purchaseInFlight.current = true;
+
+    try {
+      await runSubscribe();
+    } finally {
+      purchaseInFlight.current = false;
+    }
+  };
 
   const handleRestore = useCallback(async () => {
     if (busy) return;

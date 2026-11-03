@@ -9,6 +9,7 @@ import { Platform } from "react-native";
 import Purchases, {
   type CustomerInfo,
   type PurchasesPackage,
+  type SubscriptionOption,
   LOG_LEVEL,
   PURCHASES_ERROR_CODE,
 } from "react-native-purchases";
@@ -18,16 +19,28 @@ const ENTITLEMENT_ID = "gyanmaster_premium";
 
 // ── Configuration ──────────────────────────────────────────────────
 
+/** Purchases.configure has run in this app process (it must run only once). */
+let sdkConfigured = false;
+
+/** A signed-in user is active in RevenueCat. */
 let isConfigured = false;
 
 /**
  * Configure RevenueCat with the authenticated Clerk user ID.
- * Safe to call multiple times — subsequent calls are no-ops.
+ * The first call configures the SDK; after a logout, later calls switch
+ * identity with Purchases.logIn instead of configuring again.
+ * Safe to call multiple times while the same user is signed in.
  */
 export async function configureRevenueCat(
   clerkUserId: string
 ): Promise<void> {
   if (isConfigured) return;
+
+  if (sdkConfigured) {
+    await Purchases.logIn(clerkUserId);
+    isConfigured = true;
+    return;
+  }
 
   const apiKey =
     Platform.OS === "android"
@@ -51,11 +64,8 @@ export async function configureRevenueCat(
     appUserID: clerkUserId,
   });
 
+  sdkConfigured = true;
   isConfigured = true;
-  console.log(
-    "[RevenueCat] Configured for user:",
-    clerkUserId
-  );
 }
 
 /**
@@ -202,6 +212,39 @@ export async function getMonthlyPackage(): Promise<PurchasesPackage | null> {
   return monthly;
 }
 
+/**
+ * Find the trial / promotional subscription option on Google Play.
+ * Specifically looks for 'trial-1rs-3days' or options with an intro/free phase.
+ */
+export function getTrialSubscriptionOption(
+  pkg: PurchasesPackage
+): SubscriptionOption | null {
+  const options = pkg.product.subscriptionOptions;
+  if (!options || options.length === 0) return null;
+
+  // 1. Match known offer ID from Google Play Console ("trial-1rs-3days")
+  const byOfferId = options.find(
+    (opt) =>
+      opt.id.includes("trial-1rs-3days") ||
+      opt.id.toLowerCase().includes("trial")
+  );
+  if (byOfferId) return byOfferId;
+
+  // 2. Look for any option that has an introductory phase (e.g. ₹4 for 3 days)
+  const byIntro = options.find((opt) => opt.introPhase !== null);
+  if (byIntro) return byIntro;
+
+  // 3. Look for any option with a free trial phase (if applicable)
+  const byFree = options.find((opt) => opt.freePhase !== null);
+  if (byFree) return byFree;
+
+  // 4. Any non-base option
+  const nonBase = options.find((opt) => !opt.isBasePlan);
+  if (nonBase) return nonBase;
+
+  return null;
+}
+
 // ── Purchase ───────────────────────────────────────────────────────
 
 export interface PurchaseResult {
@@ -229,8 +272,35 @@ export async function purchaseMonthlyPackage(): Promise<PurchaseResult> {
 
     await waitForAttributionSetup();
 
-    const { customerInfo } =
-      await Purchases.purchasePackage(monthly);
+    let customerInfo: CustomerInfo;
+
+    // On Android, explicitly target the trial offer option so Google Play
+    // presents "₹4.00 for 3 days" with ₹499/mo autopay, rather than defaulting
+    // to the immediate ₹499 base plan.
+    const trialOption =
+      Platform.OS === "android" ? getTrialSubscriptionOption(monthly) : null;
+
+    if (trialOption) {
+      console.log(
+        "[RevenueCat] Purchasing specific trial subscription option:",
+        trialOption.id,
+        "pricingPhases:",
+        trialOption.pricingPhases?.map((p) => ({
+          price: p.price.formatted,
+          period: `${p.billingPeriod.value} ${p.billingPeriod.unit}`,
+        }))
+      );
+      const purchaseResult =
+        await Purchases.purchaseSubscriptionOption(trialOption);
+      customerInfo = purchaseResult.customerInfo;
+    } else {
+      console.log(
+        "[RevenueCat] No specific trial option found, purchasing via purchasePackage"
+      );
+      const purchaseResult =
+        await Purchases.purchasePackage(monthly);
+      customerInfo = purchaseResult.customerInfo;
+    }
 
     const isPremium = hasGyanMasterPremium(customerInfo);
 

@@ -2,7 +2,7 @@
   "expo": {
     "name": "GyanMaster",
     "slug": "GyanMaster",
-    "version": "1.0.13",
+    "version": "1.0.17",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "gyanmaster",
@@ -13,8 +13,8 @@
     },
     "android": {
       "permissions": [
-    "com.google.android.gms.permission.AD_ID"
-  ],
+        "com.google.android.gms.permission.AD_ID"
+      ],
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/icons/app-icon.png",
@@ -54,8 +54,8 @@
           "clientToken": "e31a19d7ce9e1d5901bf50938e46fb4d",
           "displayName": "Gyan master",
           "scheme": "fb2390874058317719",
-          "autoLogAppEventsEnabled": false,
-          "advertiserIDCollectionEnabled": false,
+          "autoLogAppEventsEnabled": true,
+          "advertiserIDCollectionEnabled": true,
           "isAutoInitEnabled": true
         }
       ]
